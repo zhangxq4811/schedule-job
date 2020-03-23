@@ -1,0 +1,8 @@
+server:
+  port: 8888
+  servlet:
+    context-path: /job
+
+spring:
+  profiles:
+    active: dev

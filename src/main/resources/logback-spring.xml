@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 日志生成位置 -->
+
+	<appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/access.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover 保存历史记录到这个文件夹一日起为后缀 -->
+			<FileNamePattern>/tmp/logs/zxq-cloud-job/output.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</Pattern>
+			<charset>UTF-8</charset> <!-- 此处设置字符集 -->
+		</encoder>
+	</appender>
+	<!-- ERROR级别日志 -->
+	<appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 过滤器，只记录WARN级别的日志 -->
+		<File>logs/error.log</File>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<!-- 最常用的滚动策略，它根据时间来制定滚动策略.既负责滚动也负责出发滚动 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!--日志输出位置  可相对、和绝对路径 -->
+			<fileNamePattern>/tmp/logs/zxq-cloud-job/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!--日志文件保留天数-->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<logger name="com.travelsky.updateDatabase.dao" additivity="true">
+		<level value="DEBUG" />
+	</logger>
+
+	<!-- 打印 日志级别-->
+	<root level="info">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="INFO"/>
+		<appender-ref ref="ERROR"/>
+	</root>
+</configuration>
