@@ -6,3 +6,19 @@ server:
 spring:
   profiles:
     active: dev
+  # freemarker
+  freemarker:
+    # 是否开启缓存 生产环境设置true
+    cache: false
+    charset: UTF-8
+    content-type: text/html
+    suffix: .html
+    template-loader-path: classpath:/templates
+    settings:
+      # 解决页面中取空值出现的异常
+      classic_compatible: true
+      template_update_delay: 0
+# 控制台mybatis日志输出
+logging:
+  level:
+    com.zxq.cloud.dao: debug

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zxq.cloud.dao.JobLogMapper">
+  <resultMap id="BaseResultMap" type="com.zxq.cloud.model.po.JobLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="job_info_id" jdbcType="INTEGER" property="jobInfoId" />
+    <result column="execute_status" jdbcType="INTEGER" property="executeStatus" />
+    <result column="execute_params" jdbcType="VARCHAR" property="executeParams" />
+    <result column="execute_result" jdbcType="VARCHAR" property="executeResult" />
+    <result column="execute_time" jdbcType="TIMESTAMP" property="executeTime" />
+    <result column="consume_time" jdbcType="BIGINT" property="consumeTime" />
+  </resultMap>
+</mapper>
