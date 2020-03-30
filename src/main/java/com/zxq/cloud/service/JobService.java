@@ -73,7 +73,9 @@ public class JobService {
         // 将任务执行的数据存放在JobDataMap中
         jobDetail.getJobDataMap().put(JobConstant.JOB_INFO_IN_JOB_DATA_MAP_KEY, JSONUtil.toJsonStr(jobInfo));
         CronTrigger trigger = TriggerBuilder.newTrigger().forJob(jobDetail)
-                .withSchedule(CronScheduleBuilder.cronSchedule(jobInfo.getCorn())).build();
+                // withMisfireHandlingInstructionDoNothing ：服务重启后不会执行已过期的任务，只会执行下一周期的任务
+                .withSchedule(CronScheduleBuilder.cronSchedule(jobInfo.getCorn()).withMisfireHandlingInstructionDoNothing())
+                .build();
         try {
             scheduler.scheduleJob(jobDetail, trigger);
             // 判断调度器是否执行
@@ -138,6 +140,10 @@ public class JobService {
                 // 暂停调度任务
                 scheduler.pauseJob(jobKey);
             } else if (status.equals(JobEnums.JobStatus.DELETED.status())) {
+                if (JobEnums.JobStatus.RUNNING.status().equals(jobInfo.getStatus())) {
+                    // 暂停调度任务
+                    scheduler.pauseJob(jobKey);
+                }
                 // 删除调度任务
                 scheduler.deleteJob(jobKey);
             } else if (status.equals(JobEnums.JobStatus.RUNNING.status())) {
@@ -149,7 +155,7 @@ public class JobService {
             // 更新jobInfo执行状态
             JobInfo update = new JobInfo();
             update.setId(jobInfo.getId());
-            update.setStatus(JobEnums.JobStatus.PAUSING.status());
+            update.setStatus(status);
             jobInfoMapper.updateByPrimaryKeySelective(update);
             return JobConstant.SUCCESS_CODE;
         } catch (SchedulerException e) {

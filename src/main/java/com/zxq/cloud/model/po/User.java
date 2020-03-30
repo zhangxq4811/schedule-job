@@ -30,6 +30,11 @@ public class User {
     private String password;
 
     /**
+     * 角色：0-普通用户、1-管理员
+     */
+    private Byte role;
+
+    /**
      * 创建时间
      */
     @Column(name = "create_time")

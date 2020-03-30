@@ -219,10 +219,11 @@ CREATE TABLE `zxq_job_user` (
 	`id` INT ( 11 ) NOT NULL AUTO_INCREMENT COMMENT '主键',
 	`username` VARCHAR ( 255 ) NOT NULL COMMENT '用户名',
 	`password` VARCHAR ( 100 ) NOT NULL COMMENT '登录密码',
+	`role` tinyint(4) NOT NULL COMMENT '角色：0-普通用户、1-管理员',
 	`create_time` datetime NOT NULL COMMENT '创建时间',
 	PRIMARY KEY ( `id` ) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT = '系统用户表';
 
 -- 创建默认用户 username=admin password=123456
-INSERT INTO zxq_job_user ( `username`, `password`, `create_time` ) VALUES ('admin','a66abb5684c45962d887564f08346e8d',NOW());
+INSERT INTO zxq_job_user ( `username`, `password`,`role`, `create_time` ) VALUES ('admin','a66abb5684c45962d887564f08346e8d',1,NOW());
 
