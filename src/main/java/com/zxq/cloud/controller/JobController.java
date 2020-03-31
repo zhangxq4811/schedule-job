@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.zxq.cloud.constant.JobConstant;
 import com.zxq.cloud.constant.JobEnums;
-import com.zxq.cloud.model.po.JobInfo;
+import com.zxq.cloud.model.bo.JobInfoBO;
 import com.zxq.cloud.model.po.JobLog;
 import com.zxq.cloud.model.query.JobInfoQuery;
 import com.zxq.cloud.model.query.JobLogQuery;
@@ -46,27 +46,39 @@ public class JobController {
      * @return
      */
     @RequestMapping("/pageJob")
-    public ResultVO listJob(JobInfoQuery jobInfoQuery) {
-        PageVO<JobInfo> page = jobService.selectJob(jobInfoQuery);
+    public ResultVO pageJob(JobInfoQuery jobInfoQuery) {
+        PageVO<JobInfoBO> page = jobService.selectJob(jobInfoQuery);
         return ResultVO.success(page);
     }
 
     /**
      * 新增一个http定时任务
-     * @param jobInfo
+     * @param jobInfoBO
      * @return
      */
     @RequestMapping("/addJob")
-    public ResultVO addJob(JobInfo jobInfo) {
+    public ResultVO addJob(JobInfoBO jobInfoBO) {
+        if (StrUtil.isBlank(jobInfoBO.getTitle())) {
+            return ResultVO.failure("任务名称不能为空");
+        }
+        if (StrUtil.isBlank(jobInfoBO.getUrl())) {
+            return ResultVO.failure("URL地址不能为空");
+        }
+        if (StrUtil.isBlank(jobInfoBO.getMethod())) {
+            return ResultVO.failure("请求方式不能为空");
+        }
+        if (StrUtil.isBlank(jobInfoBO.getJobGroupName()) && jobInfoBO.getJobGroupId() == null) {
+            return ResultVO.failure("业务部门不能为空");
+        }
         // 校验corn表达式
-        if(!CronExpression.isValidExpression(jobInfo.getCorn())) {
+        if(!CronExpression.isValidExpression(jobInfoBO.getCorn())) {
             return ResultVO.failure("非法的任务corn表达式");
         }
         // 有参数，校验参数是否为json格式
-        if (StrUtil.isNotBlank(jobInfo.getParams()) && JSONUtil.isJson(jobInfo.getParams())) {
+        if (StrUtil.isNotBlank(jobInfoBO.getParams()) && JSONUtil.isJson(jobInfoBO.getParams())) {
             return ResultVO.failure("非法的任务参数格式");
         }
-        String res = jobService.addJob(scheduler, jobInfo);
+        String res = jobService.addJob(scheduler, jobInfoBO);
         if (JobConstant.SUCCESS_CODE.equals(res)) {
             return ResultVO.success("添加成功");
         } else {
@@ -125,7 +137,7 @@ public class JobController {
      * @return
      */
     @RequestMapping("/pageJobLog")
-    public ResultVO listJob(JobLogQuery jobLogQuery) {
+    public ResultVO pageJobLog(JobLogQuery jobLogQuery) {
         if (jobLogQuery.getJobInfoId() == null) {
             return ResultVO.failure("param jobInfoId is empty");
         }

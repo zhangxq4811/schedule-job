@@ -72,6 +72,7 @@ public class HttpJob extends QuartzJobBean {
         jobLog.setJobInfoId(jobInfo.getId());
         jobLog.setExecuteStatus(executeStatus);
         jobLog.setExecuteParams(jobInfo.getParams());
+        //根据业务考虑是否要把请求结果保存至数据库
         jobLog.setExecuteResult(executeResult);
         jobLog.setConsumeTime(consumeTime);
         jobLogMapper.insertSelective(jobLog);

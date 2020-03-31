@@ -18,6 +18,12 @@ spring:
       # 解决页面中取空值出现的异常
       classic_compatible: true
       template_update_delay: 0
+# 分页配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
 # 控制台mybatis日志输出
 logging:
   level:

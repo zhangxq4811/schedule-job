@@ -1,14 +1,15 @@
 package com.zxq.cloud.controller;
 
-import com.zxq.cloud.model.po.JobInfo;
-import com.zxq.cloud.model.query.JobInfoQuery;
-import com.zxq.cloud.model.vo.PageVO;
+import com.zxq.cloud.model.po.JobGroup;
 import com.zxq.cloud.service.JobService;
 import com.zxq.cloud.util.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
 
 /**
  * 页面跳转控制器
@@ -46,11 +47,34 @@ public class ForwardController {
      * 跳转到任务列表
      * @return
      */
-    @RequestMapping("/jobList")
+    @RequestMapping("/job-list")
     public ModelAndView jobList(){
         ModelAndView modelAndView = new ModelAndView("main/job/job-list");
-        PageVO<JobInfo> pageVO = jobService.selectJob(new JobInfoQuery());
-        modelAndView.addObject("pageVO", pageVO);
+        modelAndView.addObject("jobGroupList", jobService.selectJobGroup());
+        return modelAndView;
+    }
+
+    /**
+     * 跳转到新添任务页面
+     * @return
+     */
+    @RequestMapping("/add-job")
+    public ModelAndView addJob(){
+        ModelAndView modelAndView = new ModelAndView("main/job/add-job");
+        List<JobGroup> groupList = jobService.selectJobGroup();
+        modelAndView.addObject("jobGroupList", groupList);
+        return modelAndView;
+    }
+
+    /**
+     * 跳转到编辑任务页面
+     * @return
+     */
+    @RequestMapping("/edit-job")
+    public ModelAndView editJob(@RequestParam(name = "jobInfoId") String jobInfoId){
+        ModelAndView modelAndView = new ModelAndView("main/job/edit-job");
+        List<JobGroup> groupList = jobService.selectJobGroup();
+        modelAndView.addObject("jobGroupList", groupList);
         return modelAndView;
     }
 

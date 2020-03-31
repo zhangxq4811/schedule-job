@@ -9,4 +9,9 @@ import lombok.Data;
  **/
 @Data
 public class JobInfoBO extends JobInfo {
+
+    /**
+     * 分组名
+     */
+    private String jobGroupName;
 }

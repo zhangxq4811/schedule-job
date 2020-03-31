@@ -19,7 +19,7 @@ public class PageVO<T> {
     /**
      * 当页记录数量
      */
-    private Integer size;
+    private Integer limit;
 
     /**
      * 数据集
