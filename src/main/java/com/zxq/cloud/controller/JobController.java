@@ -10,6 +10,7 @@ import com.zxq.cloud.model.query.JobInfoQuery;
 import com.zxq.cloud.model.query.JobLogQuery;
 import com.zxq.cloud.model.vo.PageVO;
 import com.zxq.cloud.model.vo.ResultVO;
+import com.zxq.cloud.service.JobManagerService;
 import com.zxq.cloud.service.JobService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
@@ -35,21 +36,16 @@ public class JobController {
     private Scheduler scheduler;
 
     /**
+     * JobManagerService
+     */
+    @Autowired
+    private JobManagerService jobManagerService;
+
+    /**
      * JobService
      */
     @Autowired
     private JobService jobService;
-
-    /**
-     * 分页获取http任务列表
-     * @param jobInfoQuery
-     * @return
-     */
-    @RequestMapping("/pageJob")
-    public ResultVO pageJob(JobInfoQuery jobInfoQuery) {
-        PageVO<JobInfoBO> page = jobService.selectJob(jobInfoQuery);
-        return ResultVO.success(page);
-    }
 
     /**
      * 新增一个http定时任务
@@ -71,14 +67,14 @@ public class JobController {
             return ResultVO.failure("业务部门不能为空");
         }
         // 校验corn表达式
-        if(!CronExpression.isValidExpression(jobInfoBO.getCorn())) {
+        if(!CronExpression.isValidExpression(jobInfoBO.getCron())) {
             return ResultVO.failure("非法的任务corn表达式");
         }
         // 有参数，校验参数是否为json格式
         if (StrUtil.isNotBlank(jobInfoBO.getParams()) && JSONUtil.isJson(jobInfoBO.getParams())) {
             return ResultVO.failure("非法的任务参数格式");
         }
-        String res = jobService.addJob(scheduler, jobInfoBO);
+        String res = jobManagerService.addJob(scheduler, jobInfoBO);
         if (JobConstant.SUCCESS_CODE.equals(res)) {
             return ResultVO.success("添加成功");
         } else {
@@ -93,7 +89,7 @@ public class JobController {
      */
     @RequestMapping("/pauseJob")
     public ResultVO pauseJob(@RequestParam(name = "jobInfoId") Integer jobInfoId) {
-        String res = jobService.pauseOrRemoveOrRestoreJob(scheduler, jobInfoId, JobEnums.JobStatus.PAUSING.status());
+        String res = jobManagerService.pauseOrRemoveOrRestoreJob(scheduler, jobInfoId, JobEnums.JobStatus.PAUSING.status());
         if (JobConstant.SUCCESS_CODE.equals(res)) {
             return ResultVO.success("操作成功");
         } else {
@@ -108,7 +104,7 @@ public class JobController {
      */
     @RequestMapping("/restoreJob")
     public ResultVO restoreJob(@RequestParam(name = "jobInfoId") Integer jobInfoId) {
-        String res = jobService.pauseOrRemoveOrRestoreJob(scheduler, jobInfoId, JobEnums.JobStatus.RUNNING.status());
+        String res = jobManagerService.pauseOrRemoveOrRestoreJob(scheduler, jobInfoId, JobEnums.JobStatus.RUNNING.status());
         if (JobConstant.SUCCESS_CODE.equals(res)) {
             return ResultVO.success("操作成功");
         } else {
@@ -123,12 +119,23 @@ public class JobController {
      */
     @RequestMapping("/removeJob")
     public ResultVO removeJob(@RequestParam(name = "jobInfoId") Integer jobInfoId) {
-        String res = jobService.pauseOrRemoveOrRestoreJob(scheduler, jobInfoId, JobEnums.JobStatus.DELETED.status());
+        String res = jobManagerService.pauseOrRemoveOrRestoreJob(scheduler, jobInfoId, JobEnums.JobStatus.DELETED.status());
         if (JobConstant.SUCCESS_CODE.equals(res)) {
             return ResultVO.success("删除成功");
         } else {
             return ResultVO.failure(res);
         }
+    }
+
+    /**
+     * 分页获取http任务列表
+     * @param jobInfoQuery
+     * @return
+     */
+    @RequestMapping("/pageJob")
+    public ResultVO pageJob(JobInfoQuery jobInfoQuery) {
+        PageVO<JobInfoBO> page = jobService.selectJob(jobInfoQuery);
+        return ResultVO.success(page);
     }
 
     /**

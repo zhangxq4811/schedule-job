@@ -9,7 +9,7 @@
     <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="method" jdbcType="VARCHAR" property="method" />
     <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="corn" jdbcType="VARCHAR" property="corn" />
+    <result column="cron" jdbcType="VARCHAR" property="cron" />
     <result column="params" jdbcType="VARCHAR" property="params" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="job_group_id" jdbcType="INTEGER" property="jobGroupId" />

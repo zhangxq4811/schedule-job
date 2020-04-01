@@ -13,6 +13,11 @@ public class JobConstant {
     public static final String JOB_GROUP_PREFIX = "SYS_JOB_GROUP_";
 
     /**
+     * trigger key 前缀
+     */
+    public static final String TRIGGER_KEY_PREFIX = "SYS_TRIGGER_KEY_";
+
+    /**
      * JobInfo存放在JobDataMap中的key
      */
     public static final String JOB_INFO_IN_JOB_DATA_MAP_KEY = "SYS_JOB_INFO_KEY";

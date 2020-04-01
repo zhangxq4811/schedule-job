@@ -35,9 +35,9 @@ public class JobInfo {
     private String title;
 
     /**
-     * corn表达式
+     * cron表达式
      */
-    private String corn;
+    private String cron;
 
     /**
      * 请求参数

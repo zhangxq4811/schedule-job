@@ -179,7 +179,7 @@ CREATE TABLE `zxq_job_info` (
 	`url` VARCHAR ( 255 ) NOT NULL COMMENT '请求路径',
 	`method` VARCHAR ( 10 ) NOT NULL COMMENT '请求方式 GET POST',
 	`title` VARCHAR ( 100 ) NOT NULL COMMENT '标题',
-	`corn` VARCHAR ( 25 ) NOT NULL COMMENT 'corn表达式',
+	`cron` VARCHAR ( 25 ) NOT NULL COMMENT 'cron表达式',
 	`params` VARCHAR ( 255 ) DEFAULT NULL COMMENT '请求参数',
 	`remark` VARCHAR ( 500 ) DEFAULT NULL COMMENT '备注',
 	`job_group_id` INT ( 11 ) NOT NULL COMMENT '分组id，关联zxq_job_group',

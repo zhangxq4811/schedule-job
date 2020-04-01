@@ -27,15 +27,15 @@
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-username"></label>
-                    <input type="text" name="username" lay-verify="required|username" placeholder="用户名" autocomplete="off" class="layui-input">
+                    <input type="text" name="username" lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input">
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-password"></label>
-                    <input type="password" name="password" lay-verify="required|password" placeholder="密码" autocomplete="off" class="layui-input">
+                    <input type="password" name="password" lay-verify="required" placeholder="密码" autocomplete="off" class="layui-input">
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-vercode"></label>
-                    <input type="text" name="verityCode" lay-verify="required|captcha" placeholder="图形验证码" autocomplete="off" class="layui-input verification captcha">
+                    <input type="text" name="verityCode" lay-verify="required" placeholder="图形验证码" autocomplete="off" class="layui-input verification captcha">
                     <div class="captcha-img">
                         <a href="javascript:;">
                             <img id="captchaPic" onclick="this.src=this.src+'?c='+Math.random();" src="${ctx}/user/getVerityCode" />

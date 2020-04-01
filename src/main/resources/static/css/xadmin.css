@@ -516,7 +516,7 @@ table th, table td {
     font-size: 12px;
 }
 .x-admin-sm .layui-input,.x-admin-sm .layui-select,.x-admin-sm .layui-textarea{
-    height: 30px;
+    height: 35px;
 }
 
 .x-admin-sm .layui-form-pane .layui-form-label{
