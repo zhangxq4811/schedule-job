@@ -1,5 +1,6 @@
 package com.zxq.cloud.model.po;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -46,8 +47,9 @@ public class JobLog {
     /**
      * 执行时间
      */
-    @Column(name = "execute_time")
-    private Date executeTime;
+    @Column(name = "create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
 
     /**
      * 任务执行消耗时间 单位：毫秒

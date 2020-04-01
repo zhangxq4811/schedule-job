@@ -127,6 +127,9 @@ public class JobManagerService {
         TriggerKey triggerKey = JobUtil.getTriggerKey(jobInfo);
         try {
             if (status.equals(JobEnums.JobStatus.PAUSING.status())) {
+                if (status.equals(jobInfo.getStatus())) {
+                    return "该任务为停止状态,不可重复操作";
+                }
                 // 暂停调度任务
                 if (!JobUtil.isPaused(scheduler, triggerKey)) {
                     scheduler.pauseJob(jobKey);
@@ -139,6 +142,9 @@ public class JobManagerService {
                 // 删除调度任务
                 scheduler.deleteJob(jobKey);
             } else if (status.equals(JobEnums.JobStatus.RUNNING.status())) {
+                if (status.equals(jobInfo.getStatus())) {
+                    return "该任务为运行状态,不可重复操作";
+                }
                 // 恢复一个任务
                 if (!JobUtil.isNormal(scheduler, triggerKey)) {
                     scheduler.resumeJob(jobKey);
@@ -158,4 +164,28 @@ public class JobManagerService {
         }
     }
 
+    /**
+     * 执行一次任务
+     * @param scheduler
+     * @param jobInfoId
+     * @return
+     */
+    public String executeJob(Scheduler scheduler, Integer jobInfoId) {
+        JobInfo jobInfo = jobInfoMapper.selectByPrimaryKey(jobInfoId);
+        if (jobInfo == null) {
+            return "no http job matched";
+        }
+        JobKey jobKey = JobUtil.getJobKey(jobInfo);
+        TriggerKey triggerKey = JobUtil.getTriggerKey(jobInfo);
+        try {
+            if (JobUtil.isPaused(scheduler, triggerKey)) {
+                return "该任务为停止状态,无法立即运行";
+            }
+            scheduler.triggerJob(jobKey);
+            return JobConstant.SUCCESS_CODE;
+        } catch (SchedulerException e) {
+            log.error("jobInfoId = {} executeJob fail : {}", jobInfoId, e);
+            return e.getMessage();
+        }
+    }
 }

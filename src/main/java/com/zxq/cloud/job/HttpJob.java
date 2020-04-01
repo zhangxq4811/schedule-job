@@ -42,7 +42,7 @@ public class HttpJob extends QuartzJobBean {
         TimeInterval timer = DateUtil.timer();
         // 任务执行记录
         JobLog jobLog = new JobLog();
-        jobLog.setExecuteTime(DateUtil.date());
+        jobLog.setCreateTime(DateUtil.date());
         Integer executeStatus = JobEnums.JobLogStatus.SUCCESS.status();
 
         String executeResult;

@@ -17,7 +17,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="job_key" jdbcType="VARCHAR" property="jobKey" />
   </resultMap>
-  <select id="selectJobInfo" resultType="com.zxq.cloud.model.bo.JobInfoBO" resultMap="BaseResultMap">
+  <select id="selectJobInfo" resultMap="BaseResultMap">
     SELECT
         jinfo.*,
         jgroup.NAME AS jobGroupName

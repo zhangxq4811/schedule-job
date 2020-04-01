@@ -1,24 +1,23 @@
 package com.zxq.cloud.service;
 
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zxq.cloud.dao.JobGroupMapper;
 import com.zxq.cloud.dao.JobInfoMapper;
 import com.zxq.cloud.dao.JobLogMapper;
 import com.zxq.cloud.model.bo.JobInfoBO;
+import com.zxq.cloud.model.bo.JobLogBO;
 import com.zxq.cloud.model.po.JobGroup;
-import com.zxq.cloud.model.po.JobLog;
 import com.zxq.cloud.model.query.JobInfoQuery;
 import com.zxq.cloud.model.query.JobLogQuery;
 import com.zxq.cloud.model.vo.PageVO;
 import com.zxq.cloud.util.JobUtil;
+import com.zxq.cloud.util.PageHelperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author zxq
@@ -53,9 +52,7 @@ public class JobService {
      */
     public PageVO<JobInfoBO> selectJob(JobInfoQuery jobInfoQuery) {
         PageVO<JobInfoBO> page = new PageVO<>();
-        int pageNum = Optional.ofNullable(jobInfoQuery.getPage()).map(v -> v-1).orElse(0);
-        int pageSize = Optional.ofNullable(jobInfoQuery.getLimit()).orElse(10);
-        PageHelper.startPage(pageNum, pageSize);
+        PageHelperUtil.startPage(jobInfoQuery.getPage(), jobInfoQuery.getLimit());
         List<JobInfoBO> jobInfoBOs = jobInfoMapper.selectJobInfo(jobInfoQuery);
         PageInfo<JobInfoBO> pageInfo = new PageInfo<>(jobInfoBOs);
         if (pageInfo != null && pageInfo.getTotal() > 0) {
@@ -74,18 +71,11 @@ public class JobService {
      * @param jobLogQuery
      * @return
      */
-    public PageVO<JobLog> selectJobLog(JobLogQuery jobLogQuery) {
-        PageVO<JobLog> page = new PageVO<>();
-        Example example = new Example(JobLog.class);
-        example.setOrderByClause("execute_time desc");
-        Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("jobInfoId", jobLogQuery.getJobInfoId());
-
-        int pageNum = Optional.ofNullable(jobLogQuery.getPage()).map(v -> v-1).orElse(0);
-        int pageSize = Optional.ofNullable(jobLogQuery.getLimit()).orElse(10);
-        PageHelper.startPage(pageNum, pageSize);
-        List<JobLog> jobLogs = jobLogMapper.selectByExample(example);
-        PageInfo<JobLog> pageInfo = new PageInfo<>(jobLogs);
+    public PageVO<JobLogBO> selectJobLog(JobLogQuery jobLogQuery) {
+        PageVO<JobLogBO> page = new PageVO<>();
+        PageHelperUtil.startPage(jobLogQuery.getPage(), jobLogQuery.getLimit());
+        List<JobLogBO> jobLogs = jobLogMapper.selectJobLog(jobLogQuery);
+        PageInfo<JobLogBO> pageInfo = new PageInfo<>(jobLogs);
         if (pageInfo != null && pageInfo.getTotal() > 0) {
             page.setList(jobLogs);
             page.setTotal((int)pageInfo.getTotal());

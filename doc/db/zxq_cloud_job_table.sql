@@ -208,7 +208,7 @@ CREATE TABLE `zxq_job_log` (
 	`execute_status` INT ( 1 ) NOT NULL COMMENT '执行状态:0-失败 1-成功',
 	`execute_params` VARCHAR ( 255 ) DEFAULT NULL COMMENT '执行参数',
 	`execute_result` LONGTEXT DEFAULT NULL COMMENT '执行结果:成功存放执行结果，失败存放失败原因',
-	`execute_time` datetime NOT NULL COMMENT '执行时间',
+	`create_time` datetime NOT NULL COMMENT '执行时间',
 	`consume_time` BIGINT ( 13 ) NOT NULL COMMENT '任务执行消耗时间 单位：毫秒',
 	PRIMARY KEY ( `id` ) USING BTREE,
 	KEY `idx_jjob_info_id` ( `job_info_id` ) USING BTREE

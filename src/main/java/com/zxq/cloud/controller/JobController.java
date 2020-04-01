@@ -5,7 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.zxq.cloud.constant.JobConstant;
 import com.zxq.cloud.constant.JobEnums;
 import com.zxq.cloud.model.bo.JobInfoBO;
-import com.zxq.cloud.model.po.JobLog;
+import com.zxq.cloud.model.bo.JobLogBO;
 import com.zxq.cloud.model.query.JobInfoQuery;
 import com.zxq.cloud.model.query.JobLogQuery;
 import com.zxq.cloud.model.vo.PageVO;
@@ -128,6 +128,21 @@ public class JobController {
     }
 
     /**
+     * 触发执行一次任务
+     * @param jobInfoId
+     * @return
+     */
+    @RequestMapping("/executeJob")
+    public ResultVO executeJob(@RequestParam(name = "jobInfoId") Integer jobInfoId) {
+        String res = jobManagerService.executeJob(scheduler, jobInfoId);
+        if (JobConstant.SUCCESS_CODE.equals(res)) {
+            return ResultVO.success("执行成功");
+        } else {
+            return ResultVO.failure(res);
+        }
+    }
+
+    /**
      * 分页获取http任务列表
      * @param jobInfoQuery
      * @return
@@ -148,7 +163,7 @@ public class JobController {
         if (jobLogQuery.getJobInfoId() == null) {
             return ResultVO.failure("param jobInfoId is empty");
         }
-        PageVO<JobLog> page = jobService.selectJobLog(jobLogQuery);
+        PageVO<JobLogBO> page = jobService.selectJobLog(jobLogQuery);
         return ResultVO.success(page);
     }
 

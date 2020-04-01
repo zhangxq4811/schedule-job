@@ -55,7 +55,19 @@ public class ForwardController {
     }
 
     /**
-     * 跳转到新添任务页面
+     * 任务日志页面
+     * @param jobInfoId
+     * @return
+     */
+    @RequestMapping("/job-log")
+    public ModelAndView jobLog(@RequestParam(name = "jobInfoId") String jobInfoId){
+        ModelAndView modelAndView = new ModelAndView("main/job/job-log");
+        modelAndView.addObject("jobInfoId", jobInfoId);
+        return modelAndView;
+    }
+
+    /**
+     * 新添任务页面
      * @return
      */
     @RequestMapping("/add-job")
@@ -67,7 +79,7 @@ public class ForwardController {
     }
 
     /**
-     * 跳转到编辑任务页面
+     * 编辑任务页面
      * @return
      */
     @RequestMapping("/edit-job")
