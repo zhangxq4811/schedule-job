@@ -87,7 +87,7 @@
     </script>
     <script type="text/html" id="currentTableBar">
         <a class="layui-btn layui-btn-sm" lay-event="showLog">
-            <i class="layui-icon">&#xe60e;</i>查看日志
+            查看日志
         </a>
     </script>
     <script>
@@ -101,7 +101,7 @@
                 elem: '#currentTableId',
                 url: '${ctx}/pageJob',
                 toolbar: '#toolbarDemo',
-                defaultToolbar: ['filter'],
+                defaultToolbar: [],
                 cols: [[
                     {type: "checkbox", width: 50, fixed: "left"},
                     {field: 'jobGroupName', width: 120, title: '分组名', align: 'center'},
@@ -231,7 +231,7 @@
             table.on('tool(currentTableFilter)', function (obj) {
                 if (obj.event === 'showLog') {
                     var id = obj.data.id;
-                    xadmin.open('添加任务','${ctx}/job-log?jobInfoId='+id,1200,650,false);
+                    xadmin.open('日志详情','${ctx}/job-log?jobInfoId='+id,1200,600,false);
                     return false;
                 }
             });

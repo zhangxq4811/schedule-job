@@ -21,22 +21,6 @@
             <div class="layui-row layui-col-space15">
                 <div class="layui-col-md12">
                     <div class="layui-card">
-                        <div class="layui-card-body">
-                            <form class="layui-form layui-col-space5">
-                                <div class="layui-input-inline layui-show-xs-block">
-                                    <select name="status">
-                                        <option value="">请选择任务状态</option>
-                                        <option value="1">正常</option>
-                                        <option value="0">停止</option>
-                                    </select>
-                                </div>
-                                <div class="layui-inline layui-show-xs-block">
-                                    <button class="layui-btn" lay-submit="" lay-filter="log-search-btn">
-                                        <i class="layui-icon">&#xe615;</i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
                         <div class="layui-card-body ">
                             <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
                         </div>
@@ -71,8 +55,8 @@
                     },
                     {field: 'createTime', width: 160, title: '执行时间', align: 'center'},
                     {field: 'executeParams', title: '执行参数', width: 220, align: 'center'},
-                    {field: 'executeResult', title: '执行结果', width: 230, align: 'center'},
-                    {field: 'consumeTime', width: 120, title: '消耗时间', align: 'center'
+                    {field: 'executeResult', title: '执行结果', width: 253, align: 'center'},
+                    {field: 'consumeTime', width: 100, title: '消耗时间', align: 'center'
                         ,templet:function(row){
                             if (row.consumeTime) {
                                 return row.consumeTime + 'ms';

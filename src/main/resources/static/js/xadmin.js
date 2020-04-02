@@ -232,8 +232,8 @@ layui.use(['layer','element','jquery'],function() {
 
 
         if($('.left-nav').css('width')=='60px'){
-          $('.left-nav').animate({width: '220px'}, 100);
-          $('.page-content').animate({left: '220px'}, 100);
+          $('.left-nav').animate({width: '185px'}, 100);
+          $('.page-content').animate({left: '185px'}, 100);
           $('.left-nav i').css('font-size','14px');
           $('.left-nav cite,.left-nav .nav_right').show();
         }
@@ -262,7 +262,7 @@ layui.use(['layer','element','jquery'],function() {
     })
     var left_tips_index = null;
     $('.left-nav #nav').on('mouseenter', '.left-nav-li', function(event) {
-      if($('.left-nav').css('width')!='220px'){
+      if($('.left-nav').css('width')!='185px'){
         var tips  = $(this).attr('lay-tips');
         left_tips_index = layer.tips(tips, $(this));
       }
@@ -273,7 +273,7 @@ layui.use(['layer','element','jquery'],function() {
     })
     // 隐藏左侧
     $('.container .left_open i').click(function(event) {
-        if($('.left-nav').css('width')=='220px'){
+        if($('.left-nav').css('width')=='185px'){
             $('.left-nav .open').click();
             $('.left-nav i').css('font-size','18px');
             $('.left-nav').animate({width: '60px'}, 100);
@@ -281,8 +281,8 @@ layui.use(['layer','element','jquery'],function() {
             $('.page-content').animate({left: '60px'}, 100);
             $('.page-content-bg').hide();
         }else{
-            $('.left-nav').animate({width: '220px'}, 100);
-            $('.page-content').animate({left: '220px'}, 100);
+            $('.left-nav').animate({width: '185px'}, 100);
+            $('.page-content').animate({left: '185px'}, 100);
             $('.left-nav i').css('font-size','14px');
             $('.left-nav cite,.left-nav .nav_right').show();
             if($(window).width()<768){

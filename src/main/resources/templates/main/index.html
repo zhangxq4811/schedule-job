@@ -17,33 +17,29 @@
           <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
           <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
-        <script>
-
-        </script>
     </head>
     <body class="index">
         <!-- 顶部开始 -->
         <div class="container">
             <div class="logo">
-                <a href="">调度系统</a></div>
+                <a href="">调度系统</a>
+            </div>
             <div class="left_open">
                 <a><i title="展开左侧栏" class="iconfont">&#xe699;</i></a>
             </div>
-            <ul class="layui-nav right" lay-filter="">
+            <ul class="layui-nav right">
                 <li class="layui-nav-item">
                     <a href="javascript:;">admin</a>
                     <dl class="layui-nav-child">
                         <!-- 二级菜单 -->
                         <dd>
-                            <a onclick="xadmin.open('个人信息','http://www.baidu.com')">个人信息</a></dd>
+                            <a onclick="xadmin.open('个人信息','http://www.baidu.com')">修改密码</a>
+                        </dd>
                         <dd>
-                            <a onclick="xadmin.open('切换帐号','http://www.baidu.com')">切换帐号</a></dd>
-                        <dd>
-                            <a href="./login.html">退出</a></dd>
+                            <a href="${ctx}/user.logout">退出</a>
+                        </dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item to-index">
-                    <a href="/">前台首页</a></li>
             </ul>
         </div>
         <!-- 顶部结束 -->
@@ -54,13 +50,13 @@
                 <ul id="nav">
                     <li>
                         <a onclick="xadmin.add_tab('任务管理','${ctx}/job-list')">
-                            <i class="iconfont" lay-tips="任务管理">&#xe6bb;</i>
+                            <i class="iconfont left-nav-li" lay-tips="任务管理">&#xe6bb;</i>
                             <cite>任务管理</cite>
                         </a>
                     </li>
                     <li>
                         <a onclick="xadmin.add_tab('用户管理','welcome1.html')">
-                            <i class="iconfont" lay-tips="用户管理">&#xe6b8;</i>
+                            <i class="iconfont left-nav-li" lay-tips="用户管理">&#xe6b8;</i>
                             <cite>用户管理</cite>
                         </a>
                     </li>
