@@ -6,6 +6,7 @@ import java.util.Optional;
 
 /**
  * 分页工具类
+ * @author zxq
  */
 public class PageHelperUtil {
 
@@ -17,7 +18,6 @@ public class PageHelperUtil {
     public static void startPage(Integer page, Integer limit) {
         int pageNum = Optional.ofNullable(page).orElse(1);
         int pageSize = Optional.ofNullable(limit).orElse(10);
-        pageNum = (pageNum -1) * pageSize;
         PageHelper.startPage(pageNum, pageSize);
     }
 

@@ -3,6 +3,7 @@ package com.zxq.cloud.model.po;
 import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -17,6 +18,7 @@ public class JobInfo {
      * 主键
      */
     @Id
+    @GeneratedValue(generator="JDBC")
     private Integer id;
 
     /**
@@ -66,9 +68,4 @@ public class JobInfo {
     @Column(name = "create_time")
     private Date createTime;
 
-    /**
-     * quartz中任务的唯一标识
-     */
-    @Column(name = "job_key")
-    private String jobKey;
 }

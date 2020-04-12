@@ -13,17 +13,9 @@ import com.zxq.cloud.model.po.JobGroup;
 import com.zxq.cloud.model.po.JobInfo;
 import com.zxq.cloud.util.JobUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
-import org.quartz.utils.Key;
+import org.quartz.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -48,26 +40,53 @@ public class JobManagerService {
     private JobGroupMapper jobGroupMapper;
 
     /**
+     * 判断是否需要创建新的任务分组
+     * @param jobInfoBO
+     * @return
+     */
+    private String checkCreateJobGroup(JobInfoBO jobInfoBO) {
+        if (jobInfoBO.getJobGroupId() == null && StrUtil.isNotBlank(jobInfoBO.getJobGroupName())) {
+            JobGroup findOne = new JobGroup();
+            findOne.setName(jobInfoBO.getJobGroupName());
+            int count = jobGroupMapper.selectCount(findOne);
+            if (count == 0) {
+                findOne.setCreateTime(DateUtil.date());
+                jobGroupMapper.insertSelective(findOne);
+                jobInfoBO.setJobGroupId(findOne.getId());
+            } else {
+                return "该分组名已存在";
+            }
+        }
+        return JobConstant.SUCCESS_CODE;
+    }
+
+    /**
      * 添加一个任务,并开启执行
      * @param jobInfoBO
      * @return
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     public String addJob(Scheduler scheduler, JobInfoBO jobInfoBO) {
-        // 判断是否需要生成新的任务分组
-        boolean createFlag = checkCreateNewJobGroup(jobInfoBO);
-        // 生成jobKey,group
-        String group = StrUtil.concat(false, JobConstant.JOB_GROUP_PREFIX, jobInfoBO.getJobGroupId().toString());
-        String jobKey = Key.createUniqueName(group);
-        // 保存该任务信息
-        jobInfoBO.setJobKey(jobKey);
-        // 新建任务默认为运行中
+        // 1.判断是否需要生成新的任务分组
+        String checkRes = checkCreateJobGroup(jobInfoBO);
+        if (!JobConstant.SUCCESS_CODE.equals(checkRes)) {
+            return checkRes;
+        }
+        // 2.新增jonInfo
+        JobInfo checkJobTitle = new JobInfo();
+        checkJobTitle.setTitle(jobInfoBO.getTitle());
+        int count = jobInfoMapper.selectCount(checkJobTitle);
+        if (count > 0) {
+            return "该任务名称已被占用";
+        }
         jobInfoBO.setStatus(JobEnums.JobStatus.RUNNING.status());
         jobInfoBO.setCreateTime(DateUtil.date());
-        int jobInfoId = jobInfoMapper.insertSelective(jobInfoBO);
+        jobInfoMapper.insertSelective(jobInfoBO);
+        int jobInfoId = jobInfoBO.getId();
         jobInfoBO.setId(jobInfoId);
 
-        // 增加一个quartz的定时任务
-        JobDetail jobDetail = JobBuilder.newJob(HttpJob.class).withIdentity(jobKey, group).build();
+        // 3.增加一个quartz的定时任务
+        JobDetail jobDetail = JobBuilder.newJob(HttpJob.class).withIdentity(JobUtil.getJobKey(jobInfoBO)).build();
         // 将任务执行的数据存放在JobDataMap中
         jobDetail.getJobDataMap().put(JobConstant.JOB_INFO_IN_JOB_DATA_MAP_KEY, JSONUtil.toJsonStr(jobInfoBO));
         CronTrigger trigger = TriggerBuilder.newTrigger().forJob(jobDetail).withIdentity(JobUtil.getTriggerKey(jobInfoBO))
@@ -82,34 +101,10 @@ public class JobManagerService {
             }
             return JobConstant.SUCCESS_CODE;
         } catch (SchedulerException e) {
-            log.error("JobService addJob scheduleJob occur exception : {}", e);
+            log.error("JobManagerService addJob scheduleJob occur exception : {}", e);
             // 手动回滚事务
-            jobInfoMapper.deleteByPrimaryKey(jobInfoId);
-            if (createFlag) {
-                jobGroupMapper.deleteByPrimaryKey(jobInfoBO.getJobGroupId());
-            }
-            return e.getMessage();
+            throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * 检查是否需要生成新的任务分组
-     * @param jobInfoBO
-     * @return
-     */
-    private boolean checkCreateNewJobGroup(JobInfoBO jobInfoBO) {
-        if (jobInfoBO.getJobGroupId() == null && StrUtil.isNotBlank(jobInfoBO.getJobGroupName())) {
-            JobGroup findOne = new JobGroup();
-            findOne.setName(jobInfoBO.getJobGroupName());
-            int count = jobGroupMapper.selectCount(findOne);
-            if (count == 0) {
-                findOne.setCreateTime(DateUtil.date());
-                jobGroupMapper.insertSelective(findOne);
-                jobInfoBO.setJobGroupId(findOne.getId());
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -159,13 +154,13 @@ public class JobManagerService {
             jobInfoMapper.updateByPrimaryKeySelective(update);
             return JobConstant.SUCCESS_CODE;
         } catch (SchedulerException e) {
-            log.error("jobInfoId = {} pauseOrRemoveOrRestoreJob fail : {}", jobInfoId, e);
+            log.error("jobInfoId = {} pauseOrRemoveOrRestoreJob error : {}", jobInfoId, e);
             return e.getMessage();
         }
     }
 
     /**
-     * 执行一次任务
+     * 立即执行任务
      * @param scheduler
      * @param jobInfoId
      * @return
@@ -184,8 +179,53 @@ public class JobManagerService {
             scheduler.triggerJob(jobKey);
             return JobConstant.SUCCESS_CODE;
         } catch (SchedulerException e) {
-            log.error("jobInfoId = {} executeJob fail : {}", jobInfoId, e);
+            log.error("jobInfoId = {} executeJob error : {}", jobInfoId, e);
             return e.getMessage();
         }
+    }
+
+    /**
+     * 修改任务
+     * @param scheduler
+     * @param jobInfoBO
+     * @return
+     */
+    @Transactional(rollbackFor = RuntimeException.class)
+    public String editJob(Scheduler scheduler, JobInfoBO jobInfoBO) {
+        JobInfo jobInfoInDB = jobInfoMapper.selectByPrimaryKey(jobInfoBO.getId());
+        if (jobInfoInDB == null) {
+            return "无法匹配指定任务";
+        }
+        if (JobEnums.JobStatus.DELETED.status().equals(jobInfoBO.getStatus())) {
+            return "无法编辑已删除的任务";
+        }
+        // 判断是否需要生成新的任务分组
+        String checkRes = checkCreateJobGroup(jobInfoBO);
+        if (!JobConstant.SUCCESS_CODE.equals(checkRes)) {
+            return checkRes;
+        }
+        jobInfoMapper.updateByPrimaryKeySelective(jobInfoBO);
+        JobKey jobKey = JobUtil.getJobKey(jobInfoInDB);
+        try {
+            // 重新设置JobDataMap的数据
+            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+            jobDetail.getJobDataMap().put(JobConstant.JOB_INFO_IN_JOB_DATA_MAP_KEY, JSONUtil.toJsonStr(jobInfoBO));
+            if (!jobInfoInDB.getCron().equals(jobInfoBO.getCron())) {
+                // 修改任务的触发时间
+                TriggerKey triggerKey = JobUtil.getTriggerKey(jobInfoInDB);
+                CronTrigger newTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey)
+                        .withSchedule(CronScheduleBuilder.cronSchedule(jobInfoBO.getCron())).build();
+                scheduler.rescheduleJob(triggerKey, newTrigger);
+                // 如果编辑的任务为暂停状态,修改完触发器之后再次执行暂停操作
+                if (JobEnums.JobStatus.PAUSING.status().equals(jobInfoInDB.getStatus())) {
+                    scheduler.pauseJob(jobKey);
+                }
+            }
+        } catch (Exception e) {
+            log.error("jobInfoId = {} editJob error : {}", jobInfoInDB.getId(), e);
+            // 手动回滚事务
+            throw new RuntimeException(e);
+        }
+        return JobConstant.SUCCESS_CODE;
     }
 }

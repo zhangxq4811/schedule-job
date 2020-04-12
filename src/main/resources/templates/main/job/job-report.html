@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<#assign ctx=springMacroRequestContext.contextPath />
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>数据统计</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <link rel="stylesheet" href="${ctx}/css/font.css">
+        <link rel="stylesheet" href="${ctx}/css/xadmin.css">
+        <script src="${ctx}/lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="${ctx}/js/xadmin.js"></script>
+        <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            任务数据统计
+                        </div>
+                        <div class="layui-card-body ">
+                            <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
+                                <li class="layui-col-md2 layui-col-xs6">
+                                    <div href="javascript:;" class="x-admin-backlog-body">
+                                        <h3>总任务数</h3>
+                                        <p>
+                                            <cite>#{amountStatistic.totalCount}</cite>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li class="layui-col-md2 layui-col-xs6">
+                                    <div href="javascript:;" class="x-admin-backlog-body">
+                                        <h3>正常运行任务数</h3>
+                                        <p>
+                                            <cite style="color: #5FB878;">#{amountStatistic.normalCount}</cite>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li class="layui-col-md2 layui-col-xs6">
+                                    <div href="javascript:;" class="x-admin-backlog-body">
+                                        <h3>暂停运行任务数</h3>
+                                        <p>
+                                            <cite style="color: #FFB800;">#{amountStatistic.pausedCount}</cite>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li class="layui-col-md2 layui-col-xs6">
+                                    <div href="javascript:;" class="x-admin-backlog-body">
+                                        <h3>已删除任务数</h3>
+                                        <p>
+                                            <cite style="color: #FF5722;">#{amountStatistic.deletedCount}</cite>
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-col-sm12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            <span>执行数据统计</span>
+                            <button class="layui-btn" style="float: right;margin-top: 7px;" onclick="openDateDialog();">
+                                统计日期&nbsp;<i class="layui-icon">&#xe637;</i>
+                            </button>
+                            <!-- 统计日期选择弹窗 -->
+                            <div id="statistic_date_content" style="text-align: center;padding: 30px;display: none;">
+                                <form class="layui-form layui-col-space5">
+                                    <div class="layui-inline layui-show-xs-block">
+                                        <input type="text" class="layui-input" id="startTime">
+                                    </div>
+                                    <div class="layui-inline layui-show-xs-block">
+                                        <input type="text" class="layui-input" id="endTime">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- 饼图 -->
+                        <div class="layui-col-sm12 layui-col-md4">
+                            <div class="layui-card">
+                                <div class="layui-card-body" style="min-height: 350px;">
+                                    <div id="pie-echart" class="layui-col-sm12" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 折线图 -->
+                        <div class="layui-col-sm12 layui-col-md8">
+                            <div class="layui-card">
+                                <div class="layui-card-body" style="min-height: 350px;">
+                                    <div id="line-echart" class="layui-col-sm12" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-col-md12">
+                    <blockquote class="layui-elem-quote layui-quote-nm">
+                        <p>觉得有帮助的朋友，欢迎您前去<a href="https://github.com/zhangxq4811/zxq-cloud-job" target="_blank" style="text-decoration:underline;color: #0366d6;"><strong>GitHub</strong></a>给个星星，谢谢您的支持！</p>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        </div>
+    </body>
+
+    <script src="${ctx}/js/echarts.min.js"></script>
+    <script src="${ctx}/js/jquery.min.js"></script>
+    <script type="text/javascript">
+        // 报表默认统计的起止时间
+        var defaultStartTime,defaultEndTime;
+        // 初始化饼图数据
+        var pieChart = echarts.init(document.getElementById('pie-echart'));
+        var pieOption = {
+            tooltip : {
+                trigger: 'item',
+                formatter: "{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['执行中','执行成功','执行失败']
+            },
+            color:['#FFB800','#5FB878','#d94619'],
+            series : [
+                {
+                    type: 'pie',
+                    radius : '55%',
+                    // radius : ['50%', '70%'],
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:0, name:'执行中'},
+                        {value:0, name:'执行成功'},
+                        {value:0, name:'执行失败'}
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+
+        // 初始化折线图数据
+        var lineChart = echarts.init(document.getElementById('line-echart'));
+        var lineOption = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data:['执行中','执行成功','执行失败']
+            },
+            color:['#FFB800','#5FB878','#d94619'],
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: [],
+                axisLabel:{
+                    showMaxLabel: true
+                }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name:'执行中',
+                    type:'line',
+                    data:[0, 0, 0, 0, 0,]
+                },
+                {
+                    name:'执行成功',
+                    type:'line',
+                    data:[0, 0, 0, 0, 0]
+                },
+                {
+                    name:'执行失败',
+                    type:'line',
+                    data:[0, 0, 0, 0, 0]
+                }
+            ]
+        };
+
+        // 加载饼图,折线图数据
+        function loadEchart(param) {
+            // 获取任务执行数据统计
+            $.ajax({
+                type: 'post',
+                url: '${ctx}/getReportStatistic',
+                data: param,
+                dataType: 'json',
+                success: function(res) {
+                    if (res.status == 200) {
+                        var responseData = res.data;
+                        // 渲染饼图
+                        pieOption.series[0].data[0].value = responseData.pie_running_r;
+                        pieOption.series[0].data[1].value = responseData.pie_success_r;
+                        pieOption.series[0].data[2].value = responseData.pie_fail_r;
+                        pieChart.setOption(pieOption,true);
+                        // 渲染折线图
+                        lineOption.xAxis.data = responseData.line_x;
+                        lineOption.series[0].ddata = responseData.line_running_y;
+                        lineOption.series[1].data = responseData.line_success_y;
+                        lineOption.series[2].data = responseData.line_fail_y;
+                        lineChart.setOption(lineOption);
+                        // 统计日期设置默认值
+                        defaultStartTime = responseData.line_x[0];
+                        defaultEndTime = responseData.line_x[responseData.line_x.length-1];
+                    }
+                }
+            });
+        }
+
+        // 打开统计日期选择弹窗
+        function openDateDialog(){
+            layui.use(['laydate','layer'], function(){
+                var laydate = layui.laydate;
+                var layer = layui.layer;
+                laydate.render({
+                    elem: '#startTime'
+                    ,value: defaultStartTime+''
+                    ,done: function (value) {
+                        var startDate = new Date(value).getTime();
+                        var endDate = new Date($('#endTime').val()).getTime();
+                        if (endDate < startDate) {
+                            layer.msg('开始日期不能大于截止日期',{offset: 'top',icon : 5,time : 1000});
+                            $('#startTime').val($('#endTime').val());
+                        }
+                    }
+                });
+                laydate.render({
+                    elem: '#endTime'
+                    ,value: defaultEndTime+''
+                    ,done: function (value) {
+                        var startDate = new Date($('#startTime').val()).getTime();
+                        var endDate = new Date(value).getTime();
+                        if (endDate < startDate) {
+                            layer.msg('截止日期不能小于开始日期',{offset: 'top',icon : 5,time : 1000});
+                            $('#endTime').val($('#startTime').val());
+                        }
+                    }
+                });
+
+                layer.open({
+                    type: 1
+                    ,title: '统计日期'
+                    ,offset: 'top'
+                    ,closeBtn: false
+                    ,area: ['450px','205px']
+                    ,shade: 0.4
+                    ,btn: ['查询', '取消']
+                    ,btn1: function(index){
+                        let startTime = $("#startTime").val();
+                        let endTime = $("#endTime").val();
+                        if (!startTime || !endTime) {
+                            layer.msg('日期不能为空',{offset: 'top',icon : 5,time : 1000});
+                            return;
+                        }
+                        $('#statistic_date_content').hide();
+                        layer.close(index);
+                        var param = {
+                            'startTime': startTime + ' 00:00:00',
+                            'endTime': endTime + ' 23:59:59',
+                        }
+                        loadEchart(param);
+                    }
+                    ,btn2: function(index){
+                        $('#statistic_date_content').hide();
+                        layer.close(index);
+                    }
+                    ,content: $('#statistic_date_content')
+                });
+            });
+        }
+
+        $(function () {
+            loadEchart(null);
+        })
+    </script>
+
+</html>

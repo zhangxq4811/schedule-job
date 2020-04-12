@@ -15,7 +15,6 @@
     <result column="job_group_id" jdbcType="INTEGER" property="jobGroupId" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="job_key" jdbcType="VARCHAR" property="jobKey" />
   </resultMap>
   <select id="selectJobInfo" resultMap="BaseResultMap">
     SELECT
@@ -36,5 +35,4 @@
     </if>
     ORDER BY jinfo.create_time DESC
   </select>
-
 </mapper>

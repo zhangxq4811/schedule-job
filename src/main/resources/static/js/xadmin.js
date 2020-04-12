@@ -232,10 +232,10 @@ layui.use(['layer','element','jquery'],function() {
 
 
         if($('.left-nav').css('width')=='60px'){
-          $('.left-nav').animate({width: '185px'}, 100);
-          $('.page-content').animate({left: '185px'}, 100);
-          $('.left-nav i').css('font-size','14px');
-          $('.left-nav cite,.left-nav .nav_right').show();
+          // $('.left-nav').animate({width: '185px'}, 100);
+          // $('.page-content').animate({left: '185px'}, 100);
+          // $('.left-nav i').css('font-size','14px');
+          // $('.left-nav cite,.left-nav .nav_right').show();
         }
 
         if($(window).width()<768){

@@ -118,9 +118,10 @@
                         }
                     },
                     {field: 'url', width: 350, title: 'URL地址', align: 'center'},
+                    {field: 'method', width: 100, title: '请求方式', align: 'center'},
                     {field: 'cron', width: 100, title: 'cron表达式', align: 'center'},
                     {field: 'nextExecuteTime', width: 160, title: '下次运行时间', align: 'center'},
-                    {field: 'params', title: '请求参数', width: 150, align: 'center'},
+                    {field: 'params', title: '请求参数', width: 200, align: 'center'},
                     {field: 'remark', width: 250, title: '备注', align: 'center'},
                     {title: '操作', minWidth: 120, templet: '#currentTableBar', fixed: "right", align: "center"}
                 ]],
@@ -155,6 +156,7 @@
                     return false;
                 }
                 var checkData = table.checkStatus('currentTableId').data;
+                console.log(checkData);
                 if (checkData.length == 0) {
                     layer.msg('请选择一条记录', {
                         icon : 5,
@@ -183,12 +185,15 @@
                                 break;
                         }
                         layer.confirm(tips, function (index) {
+                            //设置遮罩层
+                            var loading = layer.msg('提交中', {icon: 16, shade: 0.3, time:0});
                             $.ajax({
                                 type: 'post',
                                 url: '${ctx}/'+url,
                                 data: {'jobInfoId':checkData[0].id},
                                 dataType: 'json',
                                 success: function(res) {
+                                    layer.close(loading);
                                     layer.close(index);
                                     if (res.status == 200) {
                                         // 重载表格
@@ -204,12 +209,15 @@
                         });
                     } else if (obj.event === 'executeJob') { // 立即运行操作
                         layer.confirm('确定立即执行吗?', function (index) {
+                            //设置遮罩层
+                            var loading = layer.msg('提交中', {icon: 16, shade: 0.3, time:0});
                             $.ajax({
                                 type: 'post',
                                 url: '${ctx}/executeJob',
                                 data: {'jobInfoId':checkData[0].id},
                                 dataType: 'json',
                                 success: function(res) {
+                                    layer.close(loading);
                                     layer.close(index);
                                     if (res.status == 200) {
                                         layer.msg(res.message);
@@ -223,6 +231,9 @@
                             });
                         });
                         return false;
+                    } else if (obj.event === 'editJob') { //编辑任务
+                        xadmin.open('编辑任务','${ctx}/edit-job?jobInfoId='+checkData[0].id,550,600,false);
+                        return false;
                     }
                 }
             });
@@ -231,7 +242,7 @@
             table.on('tool(currentTableFilter)', function (obj) {
                 if (obj.event === 'showLog') {
                     var id = obj.data.id;
-                    xadmin.open('日志详情','${ctx}/job-log?jobInfoId='+id,1200,600,false);
+                    xadmin.open('日志详情','${ctx}/job-log?jobInfoId='+id,1108,600,false);
                     return false;
                 }
             });

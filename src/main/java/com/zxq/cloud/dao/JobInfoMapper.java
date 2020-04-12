@@ -19,4 +19,5 @@ public interface JobInfoMapper extends Mapper<JobInfo> {
      * @return
      */
     List<JobInfoBO> selectJobInfo(@Param(value = "query") JobInfoQuery query);
+
 }

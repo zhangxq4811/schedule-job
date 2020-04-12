@@ -1,121 +1,173 @@
+<!DOCTYPE html>
 <#assign ctx=springMacroRequestContext.contextPath />
-<div class="layuimini-main">
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>编辑任务</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <link rel="stylesheet" href="${ctx}/css/font.css">
+        <link rel="stylesheet" href="${ctx}/css/xadmin.css">
+        <script type="text/javascript" src="${ctx}/lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="${ctx}/js/xadmin.js"></script>
+        <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+        <!--[if lt IE 9]>
+            <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+            <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        <style>
+            .layui-input-block {
+                width: 60%;
+            }
+            .layuimini-form {
+                padding-top: 25px;
+                padding-left: 20px;
+            }
+        </style>
 
-    <div class="layui-form layuimini-form">
-        <div class="layui-form-item">
-            <label class="layui-form-label required">任务名称</label>
-            <div class="layui-input-block">
-                <input type="text" name="title" lay-verify="required" lay-reqtext="任务名称不能为空" placeholder="请输入任务名称" class="layui-input">
+    </head>
+    
+    <body style="background-color: white;">
+        <div class="layui-form layuimini-form">
+            <input type="hidden" name="id" value="${jobInfo.id}">
+            <div class="layui-form-item">
+                <label class="layui-form-label required">
+                    <span class="x-red">*</span>任务名称
+                </label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="required" autocomplete="off" placeholder="请输入任务名称" value="${jobInfo.title}" class="layui-input">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label required">业务部门</label>
-            <div class="layui-input-inline" id="add-group-select">
-                <select name="jobGroupId" lay-verify="required" lay-reqtext="业务部门不能为空" lay-search="">
-                    <option value="">直接选择或搜索选择</option>
-                    <#list jobGroupList as jobGroup>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">
+                    <span class="x-red">*</span>分组
+                </label>
+                <div class="layui-input-inline" id="add-group-select">
+                    <select name="jobGroupId" lay-verify="required" lay-search id="jobGroupId-select">
+                        <option value="">请选择分组</option>
+                        <#list jobGroupList as jobGroup>
                         <option value="${jobGroup.id}">${jobGroup.name}</option>
                     </#list>
-                </select>
+                    </select>
+                </div>
+                <div class="layui-input-inline" id="add-group-input" style="display: none;">
+                    <input type="text" name="jobGroupName" id="jobGroupId-input" placeholder="请输入分组名" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <input type="checkbox" lay-filter="addGroupBtn" title="新增分组">
+                </div>
             </div>
-            <div class="layui-input-inline" id="add-group-input" style="display: none;">
-                <input type="text" name="jobGroupName" lay-reqtext="业务部门不能为空" placeholder="请输入业务部门" class="layui-input">
+            <div class="layui-form-item">
+                <label class="layui-form-label required">
+                    <span class="x-red">*</span>请求方式
+                </label>
+                <div class="layui-input-inline">
+                    <select name="method" lay-verify="required" id="method-select">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                </div>
             </div>
-            <div class="layui-input-inline">
-                <input type="checkbox" lay-filter="addGroupBtn" name="" title="新增业务部门">
+            <div class="layui-form-item">
+                <label class="layui-form-label required">
+                    <span class="x-red">*</span>URL地址
+                </label>
+                <div class="layui-input-block">
+                    <input type="text" name="url" lay-verify="required" placeholder="请输入URL地址" value="${jobInfo.url}" class="layui-input">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label required">请求方式</label>
-            <div class="layui-input-inline">
-                <select name="method" lay-verify="required" lay-reqtext="请求方式不能为空">
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                </select>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">
+                    <span class="x-red">*</span>cron表达式
+                </label>
+                <div class="layui-input-block">
+                    <input type="text" name="cron" lay-verify="required" placeholder="请输入cron表达式" value="${jobInfo.cron}" class="layui-input">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label required">URL地址</label>
-            <div class="layui-input-block">
-                <input type="text" name="url" lay-verify="required" lay-reqtext="URL地址不能为空" placeholder="请输入URL地址" value="" class="layui-input">
+            <div class="layui-form-item">
+                <label class="layui-form-label">请求参数</label>
+                <div class="layui-input-block">
+                    <input type="text" name="params" placeholder="请输入请求参数" value="${jobInfo.params}" class="layui-input">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label required">corn表达式</label>
-            <div class="layui-input-block">
-                <input type="text" name="corn" lay-verify="required" lay-reqtext="corn表达式不能为空" placeholder="请输入corn表达式" value="" class="layui-input">
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">备注信息</label>
+                <div class="layui-input-block">
+                    <textarea name="remark" class="layui-textarea" maxlength="500" placeholder="请输入备注信息">${jobInfo.remark}</textarea>
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">请求参数</label>
-            <div class="layui-input-block">
-                <input type="text" name="params" placeholder="请输入请求参数" value="" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item layui-form-text">
-            <label class="layui-form-label">备注信息</label>
-            <div class="layui-input-block">
-                <textarea name="remark" class="layui-textarea" maxlength="500" placeholder="请输入备注信息"></textarea>
-            </div>
-        </div>
 
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button class="layui-btn" lay-submit lay-filter="saveBtn">确认添加</button>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="saveBtn">确认修改</button>
+                </div>
             </div>
         </div>
-    </div>
+        <script>
+            layui.use(['form', 'table'], function () {
+                var form = layui.form,
+                    layer = layui.layer,
+                    $ = layui.$;
 
-</div>
-<script>
-    layui.use(['form', 'table'], function () {
-        var form = layui.form,
-            layer = layui.layer,
-            table = layui.table,
-            $ = layui.$;
+                // 下拉框选择器回显值
+                $('#jobGroupId-select').val('${jobInfo.jobGroupId}');
+                $('#method-select').val('${jobInfo.method}');
 
-        /**
-         * 初始化表单，要加上，不然刷新部分组件可能会不加载
-         */
-        form.render();
+                /**
+                 * 初始化表单，要加上，不然刷新部分组件可能会不加载
+                 */
+                form.render();
 
-        // 当前弹出层，防止ID被覆盖
-        var parentIndex = layer.index;
+                //监听提交
+                form.on('submit(saveBtn)', function (data) {
+                    //设置遮罩层
+                    var loading = layer.msg('提交中', {icon: 16, shade: 0.3, time:0});
+                    $.ajax({
+                        type: 'post',
+                        url: '${ctx}/editJob',
+                        data: data.field,
+                        dataType: 'json',
+                        success: function(res) {
+                            layer.close(loading);
+                            if (res.status == 200) {
+                                // 获得frame索引
+                                var index = parent.layer.getFrameIndex(window.name);
+                                //关闭当前frame
+                                parent.layer.close(index);
+                                //刷新父级页面的表格
+                                parent.layui.table.reload('currentTableId',{page:{curr:1}});
+                            } else {
+                                //错误提示框
+                                layer.msg(res.message, {icon : 5});
+                            }
+                        },
+                        error: function() {
+                            layer.close(loading);
+                            layer.msg('系统异常', {icon : 5});
+                        }
+                    });
+                    return false;
+                });
 
-        //监听提交
-        form.on('submit(saveBtn)', function (data) {
-            $.ajax({
-                type: 'post',
-                url: '${ctx}/addJob',
-                data: data.field,
-                dataType: 'json',
-                success: function(res) {
-                    console.log(res);
-                    if (res.status == 200) {
-                        layer.close(parentIndex);
+                //监听复选框的选择
+                form.on('checkbox(addGroupBtn)', function (data) {
+                    if (data.elem.checked) {
+                        $('#add-group-select').hide();
+                        $('#add-group-input').show();
+                        $('#add-group-input input:first').attr('lay-verify','required');
+                        $('#add-group-select select:first').removeAttr('lay-verify');
+                        $('#jobGroupId-select').val('');
                     } else {
-                        //错误提示框
-                        layer.msg(res.message, {icon : 5});
+                        $('#add-group-input').hide();
+                        $('#add-group-select').show();
+                        $('#add-group-select input:first').attr('lay-verify','required');
+                        $('#add-group-input select:first').removeAttr('lay-verify');
+                        $('#jobGroupId-input').val('');
                     }
-                }
+                });
+
             });
-            return false;
-        });
+        </script>
+    </body>
 
-        //监听复选框的选择
-        form.on('checkbox(addGroupBtn)', function (data) {
-            if (data.elem.checked) {
-                $('#add-group-select').hide();
-                $('#add-group-input').show();
-                $('#add-group-input input:first').attr('lay-verify','required');
-                $('#add-group-select select:first').removeAttr('lay-verify');
-            } else {
-                $('#add-group-input').hide();
-                $('#add-group-select').show();
-                $('#add-group-select input:first').attr('lay-verify','required');
-                $('#add-group-input select:first').removeAttr('lay-verify');
-            }
-        });
-
-    });
-</script>
+</html>

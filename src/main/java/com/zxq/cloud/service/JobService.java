@@ -1,12 +1,17 @@
 package com.zxq.cloud.service;
 
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageInfo;
+import com.zxq.cloud.constant.JobEnums;
 import com.zxq.cloud.dao.JobGroupMapper;
 import com.zxq.cloud.dao.JobInfoMapper;
 import com.zxq.cloud.dao.JobLogMapper;
+import com.zxq.cloud.dao.JobLogReportMapper;
 import com.zxq.cloud.model.bo.JobInfoBO;
 import com.zxq.cloud.model.bo.JobLogBO;
 import com.zxq.cloud.model.po.JobGroup;
+import com.zxq.cloud.model.po.JobInfo;
+import com.zxq.cloud.model.po.JobLogReport;
 import com.zxq.cloud.model.query.JobInfoQuery;
 import com.zxq.cloud.model.query.JobLogQuery;
 import com.zxq.cloud.model.vo.PageVO;
@@ -17,7 +22,7 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author zxq
@@ -28,19 +33,25 @@ import java.util.List;
 public class JobService {
 
     /**
-     * JobInfoMapper
+     * 任务 dao
      */
     @Resource
     private JobInfoMapper jobInfoMapper;
 
     /**
-     * JobLogMapper
+     * 任务执行日志 dao
      */
     @Resource
     private JobLogMapper jobLogMapper;
 
     /**
-     * JobGroupMapper
+     * 任务执行日志报表 dao
+     */
+    @Resource
+    private JobLogReportMapper jobLogReportMapper;
+
+    /**
+     * 任务分组 dao
      */
     @Resource
     private JobGroupMapper jobGroupMapper;
@@ -92,5 +103,108 @@ public class JobService {
         Example example = new Example(JobGroup.class);
         example.setOrderByClause("create_time desc");
         return jobGroupMapper.selectByExample(example);
+    }
+
+    /**
+     * 获取任务数统计
+     * @return
+     */
+    public Map<String,Integer> getJobInfoAmountStatistic() {
+        HashMap<String, Integer> res = new HashMap<>(4);
+        JobInfo search = new JobInfo();
+        // 总任务数
+        int totalCount = jobInfoMapper.selectCount(search);
+
+        // 正常运行任务数
+        search.setStatus(JobEnums.JobStatus.RUNNING.status());
+        int normalCount = jobInfoMapper.selectCount(search);
+
+        // 已暂停任务数
+        search.setStatus(JobEnums.JobStatus.PAUSING.status());
+        int pausedCount = jobInfoMapper.selectCount(search);
+
+        // 已删除任务数
+        search.setStatus(JobEnums.JobStatus.DELETED.status());
+        int deletedCount = jobInfoMapper.selectCount(search);
+
+        res.put("totalCount", totalCount);
+        res.put("normalCount", normalCount);
+        res.put("pausedCount", pausedCount);
+        res.put("deletedCount", deletedCount);
+        return res;
+    }
+
+    /**
+     * 查询指定时间范围内的任务执行数据报表
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public Map<String, Object> getReportStatistic(Date startDate, Date endDate) {
+        // 折线图x轴数据
+        List<String> line_x = new ArrayList<>();
+        // 折线图-执行中-y轴数据
+        List<Integer> line_running_y = new ArrayList<>();
+        // 折线图-执行成功-y轴数据
+        List<Integer> line_success_y = new ArrayList<>();
+        // 折线图-执行失败-y轴数据
+        List<Integer> line_fail_y = new ArrayList<>();
+
+        // 饼图数据
+        Integer pie_running_r = 0;
+        Integer pie_success_r = 0;
+        Integer pie_fail_r = 0;
+
+        Example example = new Example(JobLogReport.class);
+        example.setOrderByClause("day");
+        example.createCriteria().andBetween("day", startDate, endDate);
+        List<JobLogReport> reports = jobLogReportMapper.selectByExample(example);
+        while (DateUtil.compare(startDate, endDate) < 0) {
+            line_x.add(DateUtil.formatDate(startDate));
+            int runningCount = 0;
+            int successCount = 0;
+            int failCount = 0;
+            if (reports != null) {
+                final Date compareDate = startDate;
+                Optional<JobLogReport> first = reports.stream().filter(v -> DateUtil.compare(v.getDay(), compareDate) == 0).findFirst();
+                if (first.isPresent()) {
+                    JobLogReport findInDB = first.get();
+                    runningCount = findInDB.getRunningCount();
+                    successCount = findInDB.getSuccessCount();
+                    failCount = findInDB.getFailCount();
+                }
+            }
+            line_running_y.add(runningCount);
+            line_success_y.add(successCount);
+            line_fail_y.add(failCount);
+
+            pie_running_r += runningCount;
+            pie_success_r += successCount;
+            pie_fail_r += failCount;
+
+            startDate = DateUtil.offsetDay(startDate, 1);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        // 折线图数据
+        result.put("line_x", line_x);
+        result.put("line_running_y", line_running_y);
+        result.put("line_success_y", line_success_y);
+        result.put("line_fail_y", line_fail_y);
+
+        // 饼图数据
+        result.put("pie_running_r", pie_running_r);
+        result.put("pie_success_r", pie_success_r);
+        result.put("pie_fail_r", pie_fail_r);
+
+        return result;
+    }
+
+    /**
+     * 根据id查找指定任务
+     * @param jobInfoId
+     */
+    public JobInfo selectJobInfoById(Integer jobInfoId) {
+        return jobInfoMapper.selectByPrimaryKey(jobInfoId);
     }
 }

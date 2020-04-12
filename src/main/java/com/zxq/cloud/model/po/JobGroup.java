@@ -2,9 +2,7 @@ package com.zxq.cloud.model.po;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -15,8 +13,10 @@ import java.util.Date;
 public class JobGroup {
     /**
      * 主键
+     * @GeneratedValue insert操作后会把主键id映射到实体id上
      */
     @Id
+    @GeneratedValue(generator="JDBC")
     private Integer id;
 
     /**

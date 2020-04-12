@@ -1,6 +1,7 @@
 package com.zxq.cloud.controller;
 
 import com.zxq.cloud.model.po.JobGroup;
+import com.zxq.cloud.model.po.JobInfo;
 import com.zxq.cloud.service.JobService;
 import com.zxq.cloud.util.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 页面跳转控制器
@@ -33,6 +35,17 @@ public class ForwardController {
     }
 
     /**
+     * 退出登录
+     * @return
+     */
+    @RequestMapping("/logout")
+    public ModelAndView logout(){
+        ModelAndView modelAndView = new ModelAndView("login");
+        SessionUtil.removeUserInfo();
+        return modelAndView;
+    }
+
+    /**
      * 跳转到首页
      * @return
      */
@@ -40,6 +53,18 @@ public class ForwardController {
     public ModelAndView index(){
         ModelAndView modelAndView = new ModelAndView("main/index");
         modelAndView.addObject("userInfo", SessionUtil.getUserInfo());
+        return modelAndView;
+    }
+
+    /**
+     * 任务数据统计页面
+     * @return
+     */
+    @RequestMapping("/job-report")
+    public ModelAndView jobReport(){
+        ModelAndView modelAndView = new ModelAndView("main/job/job-report");
+        Map<String, Integer> amountStatistic = jobService.getJobInfoAmountStatistic();
+        modelAndView.addObject("amountStatistic", amountStatistic);
         return modelAndView;
     }
 
@@ -83,9 +108,11 @@ public class ForwardController {
      * @return
      */
     @RequestMapping("/edit-job")
-    public ModelAndView editJob(@RequestParam(name = "jobInfoId") String jobInfoId){
+    public ModelAndView editJob(@RequestParam(name = "jobInfoId") Integer jobInfoId){
         ModelAndView modelAndView = new ModelAndView("main/job/edit-job");
         List<JobGroup> groupList = jobService.selectJobGroup();
+        JobInfo jobInfo = jobService.selectJobInfoById(jobInfoId);
+        modelAndView.addObject("jobInfo", jobInfo);
         modelAndView.addObject("jobGroupList", groupList);
         return modelAndView;
     }

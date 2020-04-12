@@ -9,7 +9,7 @@
     <result column="job_info_id" jdbcType="INTEGER" property="jobInfoId" />
     <result column="execute_status" jdbcType="INTEGER" property="executeStatus" />
     <result column="execute_params" jdbcType="VARCHAR" property="executeParams" />
-    <result column="execute_result" jdbcType="VARCHAR" property="executeResult" />
+    <result column="execute_fail_msg" jdbcType="VARCHAR" property="executeFailMsg" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="consume_time" jdbcType="BIGINT" property="consumeTime" />
   </resultMap>

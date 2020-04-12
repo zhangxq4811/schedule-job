@@ -8,9 +8,9 @@ package com.zxq.cloud.constant;
 public class JobConstant {
 
     /**
-     * job group 前缀
+     * job key 前缀
      */
-    public static final String JOB_GROUP_PREFIX = "SYS_JOB_GROUP_";
+    public static final String JOB_KEY_PREFIX = "SYS_JOB_KEY_";
 
     /**
      * trigger key 前缀

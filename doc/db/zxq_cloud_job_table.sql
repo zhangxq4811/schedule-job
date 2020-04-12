@@ -172,7 +172,7 @@ CREATE INDEX IDX_QRTZ_FT_TG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);
 commit; 
 
 
--- EXT TABLES
+-- SYSTEM TABLES
 DROP TABLE IF EXISTS `zxq_job_info`;
 CREATE TABLE `zxq_job_info` (
 	`id` INT ( 11 ) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -185,11 +185,9 @@ CREATE TABLE `zxq_job_info` (
 	`job_group_id` INT ( 11 ) NOT NULL COMMENT '分组id，关联zxq_job_group',
 	`status` INT ( 1 ) NOT NULL COMMENT '任务状态',
 	`create_time` datetime NOT NULL COMMENT '创建时间',
-	`job_key` VARCHAR ( 200 ) NOT NULL COMMENT 'quartz中任务的唯一标识',
 	PRIMARY KEY ( `id` ) USING BTREE,
 	KEY `idx_job_group_id` ( `job_group_id` ) USING BTREE,
-	KEY `idx_title` ( `title` ) USING BTREE,
-	KEY `idx_job_key` ( `job_key` ) USING BTREE
+	KEY `idx_title` ( `title` ) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT = '系统任务表';
 
 DROP TABLE IF EXISTS `zxq_job_group`;
@@ -205,14 +203,25 @@ DROP TABLE IF EXISTS `zxq_job_log`;
 CREATE TABLE `zxq_job_log` (
 	`id` INT ( 11 ) NOT NULL AUTO_INCREMENT COMMENT '主键',
 	`job_info_id` INT ( 11 ) NOT NULL COMMENT '任务id，关联zxq_job_info',
-	`execute_status` INT ( 1 ) NOT NULL COMMENT '执行状态:0-失败 1-成功',
-	`execute_params` VARCHAR ( 255 ) DEFAULT NULL COMMENT '执行参数',
-	`execute_result` LONGTEXT DEFAULT NULL COMMENT '执行结果:成功存放执行结果，失败存放失败原因',
+	`execute_status` INT ( 1 ) NOT NULL COMMENT '执行状态:0-执行失败 1-执行成功',
+	`execute_params` VARCHAR ( 500 ) DEFAULT NULL COMMENT '执行参数',
+	`execute_fail_msg` VARCHAR ( 500 ) DEFAULT NULL COMMENT '执行失败原因',
 	`create_time` datetime NOT NULL COMMENT '执行时间',
 	`consume_time` BIGINT ( 13 ) NOT NULL COMMENT '任务执行消耗时间 单位：毫秒',
 	PRIMARY KEY ( `id` ) USING BTREE,
 	KEY `idx_jjob_info_id` ( `job_info_id` ) USING BTREE
 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COMMENT = '系统任务执行记录表';
+
+DROP TABLE IF EXISTS `zxq_job_log_report`;
+CREATE TABLE `zxq_job_log_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `day` datetime DEFAULT NULL COMMENT '调度-时间',
+  `running_count` int(11) NOT NULL DEFAULT '0' COMMENT '运行中-日志数量',
+  `success_count` int(11) NOT NULL DEFAULT '0' COMMENT '执行成功-日志数量',
+  `fail_count` int(11) NOT NULL DEFAULT '0' COMMENT '执行失败-日志数量',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_day` (`day`) USING BTREE
+) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COMMENT = '系统任务执行记录报表';
 
 DROP TABLE IF EXISTS `zxq_job_user`;
 CREATE TABLE `zxq_job_user` (

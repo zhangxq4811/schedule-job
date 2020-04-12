@@ -3,9 +3,7 @@ package com.zxq.cloud.model.po;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -18,6 +16,7 @@ public class JobLog {
      * 主键
      */
     @Id
+    @GeneratedValue(generator="JDBC")
     private Integer id;
 
     /**
@@ -27,7 +26,7 @@ public class JobLog {
     private Integer jobInfoId;
 
     /**
-     * 执行状态:0-失败 1-成功
+     * 执行状态:0-执行失败 1-执行成功
      */
     @Column(name = "execute_status")
     private Integer executeStatus;
@@ -39,10 +38,10 @@ public class JobLog {
     private String executeParams;
 
     /**
-     * 执行结果:成功存放执行结果，失败存放失败原因
+     * 执行失败原因
      */
-    @Column(name = "execute_result")
-    private String executeResult;
+    @Column(name = "execute_fail_msg")
+    private String executeFailMsg;
 
     /**
      * 执行时间

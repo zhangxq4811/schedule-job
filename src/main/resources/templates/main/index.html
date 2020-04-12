@@ -17,12 +17,16 @@
           <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
           <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
+        <script>
+            // 是否开启刷新记忆tab功能
+            var is_remember = false;
+        </script>
     </head>
     <body class="index">
         <!-- 顶部开始 -->
         <div class="container">
             <div class="logo">
-                <a href="">调度系统</a>
+                <a href="" target="_blank">调度系统</a>
             </div>
             <div class="left_open">
                 <a><i title="展开左侧栏" class="iconfont">&#xe699;</i></a>
@@ -33,10 +37,10 @@
                     <dl class="layui-nav-child">
                         <!-- 二级菜单 -->
                         <dd>
-                            <a onclick="xadmin.open('个人信息','http://www.baidu.com')">修改密码</a>
+                            <a onclick="openEditPwdDialog();">修改密码</a>
                         </dd>
                         <dd>
-                            <a href="${ctx}/user.logout">退出</a>
+                            <a href="${ctx}/logout">退出</a>
                         </dd>
                     </dl>
                 </li>
@@ -49,13 +53,13 @@
             <div id="side-nav">
                 <ul id="nav">
                     <li>
-                        <a onclick="xadmin.add_tab('任务管理','${ctx}/job-list')">
+                        <a onclick="xadmin.add_tab('任务管理','${ctx}/job-list',true)">
                             <i class="iconfont left-nav-li" lay-tips="任务管理">&#xe6bb;</i>
                             <cite>任务管理</cite>
                         </a>
                     </li>
                     <li>
-                        <a onclick="xadmin.add_tab('用户管理','welcome1.html')">
+                        <a onclick="xadmin.add_tab('用户管理','welcome1.html',true)">
                             <i class="iconfont left-nav-li" lay-tips="用户管理">&#xe6b8;</i>
                             <cite>用户管理</cite>
                         </a>
@@ -69,8 +73,10 @@
         <div class="page-content">
             <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
                 <ul class="layui-tab-title">
-                    <li class="home">
-                        <i class="layui-icon">&#xe68e;</i>我的桌面</li></ul>
+                    <li class="home" onclick="reloadData();">
+                        <i class="layui-icon">&#xe68e;</i>统计中心
+                    </li>
+                </ul>
                 <div class="layui-unselect layui-form-select layui-form-selected" id="tab_right">
                     <dl>
                         <dd data-type="this">关闭当前</dd>
@@ -79,16 +85,86 @@
                 </div>
                 <div class="layui-tab-content">
                     <div class="layui-tab-item layui-show">
-                        <iframe src='./welcome.html' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+                        <iframe id="home_iframe" src='${ctx}/job-report' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
                     </div>
                 </div>
                 <div id="tab_show"></div>
             </div>
         </div>
         <div class="page-content-bg"></div>
-        <style id="theme_style"></style>
         <!-- 右侧主体结束 -->
         <!-- 中部结束 -->
+        <!-- 修改密码弹窗 -->
+        <div id="edit-pwd-content" style="padding: 30px 50px 0 0;display: none;">
+            <form class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span class="x-red">*</span>原始密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" id="old_pwd" lay-verify="title" autocomplete="off" placeholder="请输入原始密码" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span class="x-red">*</span>新密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" id="new_pwd" lay-verify="required" placeholder="请输入新密码" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </form>
+        </div>
     </body>
+
+    <script>
+        // 重新加载统计页面数据
+        function reloadData() {
+            $('#home_iframe').attr('src',$('#home_iframe').attr('src'));
+        }
+        // 打开修改密码弹窗
+        function openEditPwdDialog() {
+            layui.use(['layer'], function(){
+                var layer = layui.layer;
+
+                layer.open({
+                    type: 1
+                    ,title: '修改密码'
+                    ,offset: 'top'
+                    ,closeBtn: false
+                    ,area: ['450px','250px']
+                    ,shade: 0.4
+                    ,btn: ['修改', '取消']
+                    ,btn1: function(index){
+                        let oldPwd = $('#old_pwd').val();
+                        let newPwd = $('#new_pwd').val();
+                        if (!oldPwd || !newPwd) {
+                            layer.msg('必填项不能为空',{offset:'top',icon:5,time : 1000});
+                            return false;
+                        }
+                        //设置遮罩层
+                        var loading = layer.msg('提交中', {icon: 16, shade: 0.3, time:0});
+                        $.ajax({
+                            type: 'post',
+                            url: '${ctx}/user/editPwd',
+                            data: {'oldPwd':oldPwd,'newPwd':newPwd},
+                            dataType: 'json',
+                            success: function(res) {
+                                layer.close(loading);
+                                if (res.status == 200) {
+                                    layer.msg(res.message);
+                                    $('#edit-pwd-content').hide();
+                                    layer.close(index);
+                                } else {
+                                    layer.msg(res.message,{offset:'top',icon:5});
+                                }
+                            }
+                        });
+                    }
+                    ,btn2: function(index){
+                        $('#edit-pwd-content').hide();
+                        layer.close(index);
+                    }
+                    ,content: $('#edit-pwd-content')
+                });
+            });
+        }
+    </script>
 
 </html>

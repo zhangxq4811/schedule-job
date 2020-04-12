@@ -16,6 +16,7 @@
     <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <link rel="prefetch" ></link>
 </head>
 <body class="login-bg">
 <div class="layui-container layui-anim layui-anim-upbit">
@@ -58,13 +59,15 @@
 
         // 进行登录操作
         form.on('submit(login)', function (data) {
+            //设置遮罩层
+            var loading = layer.msg('登录中', {icon: 16, shade: 0.3, time:0});
             $.ajax({
                 type: 'post',
                 url: '${ctx}/user/auth',
-                cache: true,
                 data: data.field,
                 dataType: 'json',
                 success: function(res) {
+                    layer.close(loading);
                     if (res.status == 200) {
                         window.open('${ctx}/index', '_self');
                     } else {

@@ -8,8 +8,10 @@ import cn.hutool.json.JSONUtil;
 import com.zxq.cloud.constant.JobConstant;
 import com.zxq.cloud.constant.JobEnums;
 import com.zxq.cloud.dao.JobLogMapper;
+import com.zxq.cloud.dao.JobLogReportMapper;
 import com.zxq.cloud.model.po.JobInfo;
 import com.zxq.cloud.model.po.JobLog;
+import com.zxq.cloud.model.po.JobLogReport;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * htt任务处理类
@@ -31,53 +34,79 @@ import javax.annotation.Resource;
 public class HttpJob extends QuartzJobBean {
 
     /**
-     * JobGroupMapper
+     * 任务日志Mapper
      */
     @Resource
     private JobLogMapper jobLogMapper;
 
+    /**
+     * 任务日志报表Mapper
+     */
+    @Resource
+    private JobLogReportMapper jobLogReportMapper;
+
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
-        // 计时器
+        // 开启计时器
         TimeInterval timer = DateUtil.timer();
-        // 任务执行记录
+
+        // 更新当天的任务日志报表
+        int reportId = this.getJobLogReportByDay(DateUtil.beginOfDay(DateUtil.date()));
+        jobLogReportMapper.increaseRunningCount(reportId);
+
+        // 创建任务执行记录
         JobLog jobLog = new JobLog();
         jobLog.setCreateTime(DateUtil.date());
-        Integer executeStatus = JobEnums.JobLogStatus.SUCCESS.status();
 
-        String executeResult;
-        JobInfo jobInfo = null;
         // 获取任务执行的数据
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
         String data = jobDataMap.getString(JobConstant.JOB_INFO_IN_JOB_DATA_MAP_KEY);
         log.info("jobInfo from jobDataMap = {}", data);
-        try {
-            // http任务执行成功
-            jobInfo = JSONUtil.toBean(data, JobInfo.class);
-            if (jobInfo == null) {
-                log.info("jobKey = {} not find execute data", jobExecutionContext.getJobDetail().getKey());
-                return;
-            }
-            executeResult = sendHttpRequest(jobInfo);
-        } catch (Exception e) {
-            // http任务执行失败
-            executeStatus = JobEnums.JobLogStatus.FAILURE.status();
-            executeResult = e.getMessage();
-            log.error("HttpRequest url = {} execute fail : {}", jobInfo.getUrl(), e);
-        }
-        log.info("jobInfoId = {} sendHttpRequest response = {}", jobInfo.getId(), executeResult);
+        JobInfo jobInfo = JSONUtil.toBean(data, JobInfo.class);
 
-        //花费毫秒数
+        // 执行http请求
+        try {
+            String executeResult = sendHttpRequest(jobInfo);
+            jobLog.setExecuteStatus(JobEnums.JobLogStatus.SUCCESS.status());
+            jobLogReportMapper.increaseSuccessCount(reportId);
+            log.error("HttpJob jobInfoId = {} url = {} execute success, HttpResponse : {}", jobInfo.getId(), jobInfo.getUrl(), executeResult);
+        } catch (Exception e) {
+            // http请求失败
+            jobLog.setExecuteStatus(JobEnums.JobLogStatus.FAILURE.status());
+            jobLog.setExecuteFailMsg(e.getMessage());
+            jobLogReportMapper.increaseFailCount(reportId);
+            log.error("HttpJob jobInfoId = {} url = {} execute fail, HttpResponse : {}", jobInfo.getId(), jobInfo.getUrl(), e);
+        }
+
+        //计算任务执行花费时间(毫秒)
         long consumeTime = timer.interval();
         jobLog.setJobInfoId(jobInfo.getId());
-        jobLog.setExecuteStatus(executeStatus);
         jobLog.setExecuteParams(jobInfo.getParams());
-        //根据业务考虑是否要把请求结果保存至数据库
-        jobLog.setExecuteResult(executeResult);
         jobLog.setConsumeTime(consumeTime);
         jobLogMapper.insertSelective(jobLog);
     }
 
+    /**
+     * 获取当天的任务日志报表id
+     * @param day
+     * @return
+     */
+    private int getJobLogReportByDay(Date day) {
+        JobLogReport search = new JobLogReport();
+        search.setDay(day);
+        JobLogReport jobLogReport = jobLogReportMapper.selectOne(search);
+        if (jobLogReport == null) {
+            jobLogReportMapper.insertSelective(search);
+            return search.getId();
+        }
+        return jobLogReport.getId();
+    }
+
+    /**
+     * 根据jobInfo发送http请求
+     * @param jobInfo
+     * @return
+     */
     private String sendHttpRequest(JobInfo jobInfo) {
         String response = null;
         String url = jobInfo.getUrl();

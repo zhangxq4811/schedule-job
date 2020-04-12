@@ -1,5 +1,7 @@
 package com.zxq.cloud.controller;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.zxq.cloud.constant.JobConstant;
@@ -20,6 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.Map;
 
 /**
  * @author zxq
@@ -48,35 +53,67 @@ public class JobController {
     private JobService jobService;
 
     /**
+     * 参数校验
+     * @param jobInfoBO
+     * @return
+     */
+    private String commonValidate(JobInfoBO jobInfoBO) {
+        if (StrUtil.isBlank(jobInfoBO.getTitle())) {
+            return "任务名称不能为空";
+        }
+        if (StrUtil.isBlank(jobInfoBO.getUrl())) {
+            return "URL地址不能为空";
+        }
+        if (StrUtil.isBlank(jobInfoBO.getMethod())) {
+            return "请求方式不能为空";
+        }
+        if (StrUtil.isBlank(jobInfoBO.getJobGroupName()) && jobInfoBO.getJobGroupId() == null) {
+            return "业务部门不能为空";
+        }
+        // 校验corn表达式
+        if(!CronExpression.isValidExpression(jobInfoBO.getCron())) {
+            return "非法的任务corn表达式";
+        }
+        // 有参数，校验参数是否为json格式
+        if (StrUtil.isNotBlank(jobInfoBO.getParams()) && JSONUtil.isJson(jobInfoBO.getParams())) {
+            return "非法的任务参数格式";
+        }
+        return JobConstant.SUCCESS_CODE;
+    }
+
+    /**
      * 新增一个http定时任务
      * @param jobInfoBO
      * @return
      */
     @RequestMapping("/addJob")
     public ResultVO addJob(JobInfoBO jobInfoBO) {
-        if (StrUtil.isBlank(jobInfoBO.getTitle())) {
-            return ResultVO.failure("任务名称不能为空");
-        }
-        if (StrUtil.isBlank(jobInfoBO.getUrl())) {
-            return ResultVO.failure("URL地址不能为空");
-        }
-        if (StrUtil.isBlank(jobInfoBO.getMethod())) {
-            return ResultVO.failure("请求方式不能为空");
-        }
-        if (StrUtil.isBlank(jobInfoBO.getJobGroupName()) && jobInfoBO.getJobGroupId() == null) {
-            return ResultVO.failure("业务部门不能为空");
-        }
-        // 校验corn表达式
-        if(!CronExpression.isValidExpression(jobInfoBO.getCron())) {
-            return ResultVO.failure("非法的任务corn表达式");
-        }
-        // 有参数，校验参数是否为json格式
-        if (StrUtil.isNotBlank(jobInfoBO.getParams()) && JSONUtil.isJson(jobInfoBO.getParams())) {
-            return ResultVO.failure("非法的任务参数格式");
+        String validate = commonValidate(jobInfoBO);
+        if (!JobConstant.SUCCESS_CODE.equals(validate)) {
+            return ResultVO.failure(validate);
         }
         String res = jobManagerService.addJob(scheduler, jobInfoBO);
         if (JobConstant.SUCCESS_CODE.equals(res)) {
             return ResultVO.success("添加成功");
+        } else {
+            return ResultVO.failure(res);
+        }
+    }
+
+    /**
+     * 编辑任务
+     * @param jobInfoBO
+     * @return
+     */
+    @RequestMapping("/editJob")
+    public ResultVO editJob(JobInfoBO jobInfoBO) {
+        String validate = commonValidate(jobInfoBO);
+        if (!JobConstant.SUCCESS_CODE.equals(validate)) {
+            return ResultVO.failure(validate);
+        }
+        String res = jobManagerService.editJob(scheduler, jobInfoBO);
+        if (JobConstant.SUCCESS_CODE.equals(res)) {
+            return ResultVO.success("修改成功");
         } else {
             return ResultVO.failure(res);
         }
@@ -165,6 +202,31 @@ public class JobController {
         }
         PageVO<JobLogBO> page = jobService.selectJobLog(jobLogQuery);
         return ResultVO.success(page);
+    }
+
+    /**
+     * 获取任务执行数据统计
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @RequestMapping("/getReportStatistic")
+    public ResultVO getReportStatistic(String startTime, String endTime) {
+        Date startDate;
+        Date endDate;
+        if (StrUtil.isNotBlank(startTime) && StrUtil.isNotBlank(endTime)) {
+            startDate = DateUtil.parseDateTime(startTime);
+            endDate = DateUtil.parseDateTime(endTime);
+        } else if (StrUtil.isBlank(startTime) && StrUtil.isBlank(endTime)) {
+            // 默认统计过去5天数据
+            DateTime date = DateUtil.date();
+            startDate = DateUtil.beginOfDay(DateUtil.offsetDay(date, -4));
+            endDate = DateUtil.endOfDay(date);
+        } else {
+            return ResultVO.failure("params error");
+        }
+        Map<String, Object> reportStatistic = jobService.getReportStatistic(startDate, endDate);
+        return ResultVO.success(reportStatistic);
     }
 
 }

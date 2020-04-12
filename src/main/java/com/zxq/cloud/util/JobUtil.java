@@ -25,9 +25,8 @@ public class JobUtil {
      * @return
      */
     public static JobKey getJobKey(JobInfo jobInfo) {
-        String jobKey = jobInfo.getJobKey();
-        String group = JobConstant.JOB_GROUP_PREFIX + jobInfo.getJobGroupId();
-        return new JobKey(jobKey, group);
+        String jobKey = JobConstant.JOB_KEY_PREFIX + jobInfo.getId();
+        return new JobKey(jobKey);
     }
 
     /**
@@ -36,9 +35,8 @@ public class JobUtil {
      * @return
      */
     public static TriggerKey getTriggerKey(JobInfo jobInfo) {
-        String name = JobConstant.TRIGGER_KEY_PREFIX + jobInfo.getJobKey();
-        String group = JobConstant.TRIGGER_KEY_PREFIX + JobConstant.JOB_GROUP_PREFIX + jobInfo.getJobGroupId();
-        return new TriggerKey(name, group);
+        String triggerKey = JobConstant.TRIGGER_KEY_PREFIX + jobInfo.getId();
+        return new TriggerKey(triggerKey);
     }
 
     /**

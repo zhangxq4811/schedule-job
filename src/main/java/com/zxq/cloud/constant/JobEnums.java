@@ -53,11 +53,11 @@ public class JobEnums {
         /**
          * 已暂停
          */
-        FAILURE(0, "失败"),
+        FAILURE(0, "执行失败"),
         /**
          * 运行中
          */
-        SUCCESS(1, "成功");
+        SUCCESS(1, "执行成功");
 
         /**
          * 状态

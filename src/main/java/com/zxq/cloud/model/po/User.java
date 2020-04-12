@@ -3,6 +3,7 @@ package com.zxq.cloud.model.po;
 import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
@@ -17,6 +18,7 @@ public class User {
      * 主键
      */
     @Id
+    @GeneratedValue(generator="JDBC")
     private Integer id;
 
     /**

@@ -3,6 +3,7 @@ package com.zxq.cloud.controller;
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.util.StrUtil;
+import com.zxq.cloud.constant.JobConstant;
 import com.zxq.cloud.model.po.User;
 import com.zxq.cloud.model.vo.ResultVO;
 import com.zxq.cloud.service.UserService;
@@ -69,6 +70,26 @@ public class UserController {
             } else {
                 return ResultVO.failure("用户名或密码错误");
             }
+        }
+    }
+
+    /**
+     * 修改密码
+     * @param oldPwd
+     * @param newPwd
+     * @return
+     */
+    @RequestMapping("/editPwd")
+    @ResponseBody
+    public ResultVO editPwd(@RequestParam String oldPwd, @RequestParam String newPwd) {
+        if (StrUtil.isBlank(oldPwd) || StrUtil.isBlank(newPwd)) {
+            return ResultVO.failure("参数缺失");
+        }
+        String res = userService.editPwd(oldPwd, newPwd);
+        if (JobConstant.SUCCESS_CODE.equals(res)) {
+            return ResultVO.success("修改成功");
+        } else {
+            return ResultVO.failure(res);
         }
     }
 

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zxq.cloud.dao.JobLogReportMapper">
+  <resultMap id="BaseResultMap" type="com.zxq.cloud.model.po.JobLogReport">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="day" jdbcType="TIMESTAMP" property="day" />
+    <result column="running_count" jdbcType="INTEGER" property="runningCount" />
+    <result column="success_count" jdbcType="INTEGER" property="successCount" />
+    <result column="fail_count" jdbcType="INTEGER" property="failCount" />
+  </resultMap>
+  <update id="increaseRunningCount" parameterType="java.lang.Integer">
+    UPDATE
+        zxq_job_log_report
+    SET
+        running_count = running_count + 1
+    WHERE id = #{id}
+  </update>
+
+  <update id="increaseSuccessCount" parameterType="java.lang.Integer">
+   UPDATE
+        zxq_job_log_report
+    SET
+        success_count = success_count + 1,
+        running_count = running_count - 1
+    WHERE id = #{id}
+  </update>
+
+  <update id="increaseFailCount" parameterType="java.lang.Integer">
+    UPDATE
+        zxq_job_log_report
+    SET
+        fail_count = fail_count + 1,
+        running_count = running_count - 1
+    WHERE id = #{id}
+  </update>
+</mapper>
