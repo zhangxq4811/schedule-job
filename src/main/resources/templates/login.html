@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>后台管理-登陆</title>
+    <title>调度系统</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -12,6 +12,8 @@
     <meta name="format-detection" content="telephone=no">
     <link rel="stylesheet" href="${ctx}/lib/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="${ctx}/css/login.css" media="all">
+    <link rel="shortcut icon" href="${ctx}/images/favicon.ico"/>
+
     <!--[if lt IE 9]>
     <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
     <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
@@ -76,8 +78,7 @@
                         //提示框
                         layer.msg(res.message, {
                             icon : 5,
-                            offset : "auto",
-                            time : 1500
+                            offset : "auto"
                         });
                     }
                 }

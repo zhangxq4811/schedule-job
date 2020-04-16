@@ -29,7 +29,7 @@ public class SessionUtil {
      * 获取session
      * @return
      */
-    public static HttpSession getSession() {
+    private static HttpSession getSession() {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         return attrs.getRequest().getSession();
     }
