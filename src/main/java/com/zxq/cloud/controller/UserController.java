@@ -5,6 +5,8 @@ import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.util.StrUtil;
 import com.zxq.cloud.constant.JobConstant;
 import com.zxq.cloud.model.po.User;
+import com.zxq.cloud.model.query.UserQuery;
+import com.zxq.cloud.model.vo.PageVO;
 import com.zxq.cloud.model.vo.ResultVO;
 import com.zxq.cloud.service.UserService;
 import com.zxq.cloud.util.SessionUtil;
@@ -66,6 +68,7 @@ public class UserController {
             User user = userService.auth(username, password);
             if (user != null) {
                 SessionUtil.putUserInfo(user);
+                SessionUtil.removeVerityCode();
                 return ResultVO.success();
             } else {
                 return ResultVO.failure("用户名或密码错误");
@@ -88,6 +91,59 @@ public class UserController {
         String res = userService.editPwd(oldPwd, newPwd);
         if (JobConstant.SUCCESS_CODE.equals(res)) {
             return ResultVO.success("修改成功");
+        } else {
+            return ResultVO.failure(res);
+        }
+    }
+
+    /**
+     * 分页获取用户数据
+     * @param userQuery
+     * @return
+     */
+    @RequestMapping("/pageUser")
+    @ResponseBody
+    public ResultVO pageUser(UserQuery userQuery) {
+        PageVO<User> page = userService.selectUser(userQuery);
+        return ResultVO.success(page);
+    }
+
+    /**
+     * 新增用户
+     * @param user
+     * @return
+     */
+    @RequestMapping("/addUser")
+    @ResponseBody
+    public ResultVO addUser(User user) {
+        if (StrUtil.isBlank(user.getUsername())) {
+            return ResultVO.failure("用户名不能为空");
+        }
+        if (StrUtil.isBlank(user.getPassword())) {
+            return ResultVO.failure("登录密码不能为空");
+        }
+        if (user.getRole() == null) {
+            return ResultVO.failure("请设置用户角色");
+        }
+        String res = userService.insertUser(user);
+        if (JobConstant.SUCCESS_CODE.equals(res)) {
+            return ResultVO.success();
+        } else {
+            return ResultVO.failure(res);
+        }
+    }
+
+    /**
+     * 删除用户 - 普通用户无删除权限
+     * @param userId
+     * @return
+     */
+    @RequestMapping("/removeUser")
+    @ResponseBody
+    public ResultVO pageUser(@RequestParam Integer userId) {
+        String res = userService.deleteUser(userId);
+        if (JobConstant.SUCCESS_CODE.equals(res)) {
+            return ResultVO.success("删除成功");
         } else {
             return ResultVO.failure(res);
         }

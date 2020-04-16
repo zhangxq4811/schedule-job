@@ -1,7 +1,6 @@
 package com.zxq.cloud.config;
 
 import org.quartz.Scheduler;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.io.IOException;
@@ -9,8 +8,9 @@ import java.io.IOException;
 /**
  * @author zxq
  * @date 2020/3/24 15:16
+ * springboot 2.x中，已经默认支持了quartz，提供了调度器工厂（SchedulerFactory）和调度器的bean的定义
  **/
-@Configuration
+@Deprecated
 public class QuartzConfig {
 
     /**

@@ -60,7 +60,7 @@ body{
 }
 .captcha-img {
     display:inline-block;
-    width:34%;float:right;
+    width:36%;float:right;
 }
 .captcha-img img {
     height:34px;

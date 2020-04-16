@@ -3,6 +3,7 @@ package com.zxq.cloud.util;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.zxq.cloud.constant.JobConstant;
+import com.zxq.cloud.constant.JobEnums;
 import com.zxq.cloud.model.po.JobInfo;
 import org.quartz.CronExpression;
 import org.quartz.JobKey;
@@ -91,6 +92,18 @@ public class JobUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * 判断该是否为已删除的任务
+     * @param jobInfo
+     * @return
+     */
+    public static boolean isDeletedJob(JobInfo jobInfo) {
+        if (jobInfo != null && !JobEnums.JobStatus.DELETED.status().equals(jobInfo.getStatus())) {
+            return false;
+        }
+        return true;
     }
 
 }

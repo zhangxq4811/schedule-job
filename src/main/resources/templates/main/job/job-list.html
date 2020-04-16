@@ -156,7 +156,6 @@
                     return false;
                 }
                 var checkData = table.checkStatus('currentTableId').data;
-                console.log(checkData);
                 if (checkData.length == 0) {
                     layer.msg('请选择一条记录', {
                         icon : 5,
@@ -199,7 +198,7 @@
                                         // 重载表格
                                         layer.msg(res.message);
                                         // 重载表格
-                                        table.reload('currentTableId', {page: {curr:1}});
+                                        table.reload('currentTableId');
                                     } else {
                                         //错误提示框
                                         layer.msg(res.message, {icon : 5});
@@ -222,7 +221,7 @@
                                     if (res.status == 200) {
                                         layer.msg(res.message);
                                         // 重载表格
-                                        table.reload('currentTableId', {page: {curr:1}});
+                                        table.reload('currentTableId');
                                     } else {
                                         //错误提示框
                                         layer.msg(res.message, {icon : 5});

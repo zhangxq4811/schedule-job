@@ -115,7 +115,7 @@ public class JobManagerService {
      */
     public String pauseOrRemoveOrRestoreJob(Scheduler scheduler, Integer jobInfoId, Integer status) {
         JobInfo jobInfo = jobInfoMapper.selectByPrimaryKey(jobInfoId);
-        if (jobInfo == null) {
+        if (jobInfo == null || JobUtil.isDeletedJob(jobInfo)) {
             return "no http job matched";
         }
         JobKey jobKey = JobUtil.getJobKey(jobInfo);
@@ -167,7 +167,7 @@ public class JobManagerService {
      */
     public String executeJob(Scheduler scheduler, Integer jobInfoId) {
         JobInfo jobInfo = jobInfoMapper.selectByPrimaryKey(jobInfoId);
-        if (jobInfo == null) {
+        if (jobInfo == null || JobUtil.isDeletedJob(jobInfo)) {
             return "no http job matched";
         }
         JobKey jobKey = JobUtil.getJobKey(jobInfo);
@@ -196,7 +196,7 @@ public class JobManagerService {
         if (jobInfoInDB == null) {
             return "无法匹配指定任务";
         }
-        if (JobEnums.JobStatus.DELETED.status().equals(jobInfoBO.getStatus())) {
+        if (JobUtil.isDeletedJob(jobInfoInDB)) {
             return "无法编辑已删除的任务";
         }
         // 判断是否需要生成新的任务分组

@@ -34,7 +34,7 @@
             </div>
             <ul class="layui-nav right">
                 <li class="layui-nav-item">
-                    <a href="javascript:;">admin</a>
+                    <a href="javascript:;">${userInfo.username}</a>
                     <dl class="layui-nav-child">
                         <!-- 二级菜单 -->
                         <dd>
@@ -60,7 +60,7 @@
                         </a>
                     </li>
                     <li>
-                        <a onclick="xadmin.add_tab('用户管理','welcome1.html',true)">
+                        <a onclick="xadmin.add_tab('用户管理','${ctx}/user-list',true)">
                             <i class="iconfont left-nav-li" lay-tips="用户管理">&#xe6b8;</i>
                             <cite>用户管理</cite>
                         </a>

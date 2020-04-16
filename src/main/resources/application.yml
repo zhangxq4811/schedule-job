@@ -9,7 +9,7 @@ spring:
   # freemarker
   freemarker:
     # 是否开启缓存 生产环境设置true
-    cache: false
+    cache: true
     charset: UTF-8
     content-type: text/html
     suffix: .html
@@ -24,7 +24,3 @@ pagehelper:
   reasonable: true
   support-methods-arguments: true
   params: count=countSql
-# 控制台mybatis日志输出
-logging:
-  level:
-    com.zxq.cloud.dao: debug

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<#assign ctx=springMacroRequestContext.contextPath />
+<html class="x-admin-sm">
+    <head>
+        <meta charset="UTF-8">
+        <title>调度系统</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <link rel="stylesheet" href="./css/font.css">
+        <link rel="stylesheet" href="./css/xadmin.css">
+        <script src="./lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="./js/xadmin.js"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        <style>
+            .layui-table-cell .layui-form-checkbox[lay-skin="primary"] {
+                left: 32%;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <form class="layui-form layui-col-space5">
+                                <div class="layui-inline layui-show-xs-block">
+                                    <input type="text" name="username" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline layui-show-xs-block">
+                                    <button class="layui-btn" lay-submit="" lay-filter="data-search-btn">
+                                        <i class="layui-icon">&#xe615;</i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="layui-card-body">
+                            <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="text/html" id="toolbarDemo">
+        <div class = "layui-btn-container" >
+            <button class="layui-btn" lay-event="addUser">
+                <i class="layui-icon">&#xe61f;</i>添加
+            </button>
+            <button class="layui-btn layui-btn-danger" lay-event="removeUser">
+                <i class="layui-icon">&#xe640;</i>删除
+            </button>
+        </div >
+    </script>
+    <script>
+        layui.use(['form', 'table'], function() {
+            var $ = layui.jquery,
+                form = layui.form,
+                table = layui.table;
+            // 初始化表格
+            <!-- 管理员具有增,删权限 -->
+            let toolbar = "${userInfo.role}" == 1 ? '#toolbarDemo' : null;
+            table.render({
+                elem: '#currentTableId',
+                url: '${ctx}/user/pageUser',
+                toolbar: toolbar,
+                defaultToolbar: [],
+                cols: [[
+                    {type: "checkbox", width: 50},
+                    {field: 'id', width: 100, title: '用户ID', align: 'center'},
+                    {field: 'username', width: 180, title: '用户名', align: 'center'},
+                    {field: 'role', width: 180, title: '角色', align: 'center'
+                        ,templet:function(row){
+                            if (row.role == 1) {
+                                return '管理员';
+                            } else if (row.role == 0) {
+                                return '普通用户';
+                            } else {
+                                return "-"
+                            }
+                        }
+                    },
+                    {field: 'createTime', width: 350, title: '用户创建时间', align: 'center'}
+                ]],
+                limits: [10, 15, 20, 25, 50, 100],
+                limit: 10,
+                page: true,
+                //res 即为原始返回的数据
+                parseData: function(res) {
+                    return {
+                        "code": res.status == 200 ? 0 : -1, //解析接口状态
+                        "msg": res.message, //解析提示文本
+                        "count": res.data.total, //解析数据长度
+                        "data": res.data.list //解析数据列表
+                    };
+                }
+            });
+
+            // 头工具栏事件
+            table.on('toolbar(currentTableFilter)', function (obj) {
+                if (obj.event == "addUser") {
+                    xadmin.open('新增用户','${ctx}/add-user',500,400,false);
+                    return false;
+                }
+                var checkData = table.checkStatus('currentTableId').data;
+                if (checkData.length == 0) {
+                    layer.msg('请选择一条记录', {
+                        icon : 5,
+                        offset : "top",
+                        time : 1000
+                    });
+                } else if (checkData.length > 1){
+                    layer.msg('暂不支持批量操作', {
+                        icon : 5,
+                        offset : "top",
+                        time : 1000
+                    });
+                } else {
+                    if (obj.event === 'removeUser') {
+                        layer.confirm('确定删除吗?', function (index) {
+                            //设置遮罩层
+                            var loading = layer.msg('提交中', {icon: 16, shade: 0.3, time:0});
+                            $.ajax({
+                                type: 'post',
+                                url: '${ctx}/user/removeUser',
+                                data: {'userId':checkData[0].id},
+                                dataType: 'json',
+                                success: function(res) {
+                                    layer.close(loading);
+                                    layer.close(index);
+                                    if (res.status == 200) {
+                                        // 重载表格
+                                        layer.msg(res.message);
+                                        // 重载表格
+                                        table.reload('currentTableId', {page: {curr:1}});
+                                    } else {
+                                        //错误提示框
+                                        layer.msg(res.message, {icon : 5});
+                                    }
+                                }
+                            });
+                        });
+                    }
+                }
+            });
+
+            // 监听搜索操作
+            form.on('submit(data-search-btn)', function (data) {
+                //执行搜索重载
+                table.reload('currentTableId', {
+                    method: 'post'
+                    , page: {
+                        curr: 1
+                    }
+                    , where: {
+                        username: data.field.username
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+
+</html>

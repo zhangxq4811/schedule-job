@@ -83,4 +83,16 @@ public class SessionUtil {
         return (User) session.getAttribute(USER_INFO_IN_SESSION_KEY);
     }
 
+    /**
+     * 判断当前登录的用户是否为管理员
+     * @return
+     */
+    public static boolean isSuperUser() {
+        User userInfo = getUserInfo();
+        if (userInfo != null && userInfo.getRole() == 1) {
+            return true;
+        }
+        return false;
+    }
+
 }

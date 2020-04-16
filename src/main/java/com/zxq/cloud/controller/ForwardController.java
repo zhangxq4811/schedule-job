@@ -80,6 +80,27 @@ public class ForwardController {
     }
 
     /**
+     * 跳转到用户列表
+     * @return
+     */
+    @RequestMapping("/user-list")
+    public ModelAndView userList(){
+        ModelAndView modelAndView = new ModelAndView("main/user/user-list");
+        modelAndView.addObject("userInfo", SessionUtil.getUserInfo());
+        return modelAndView;
+    }
+
+    /**
+     * 新增用户页面
+     * @return
+     */
+    @RequestMapping("/add-user")
+    public ModelAndView addUser(){
+        ModelAndView modelAndView = new ModelAndView("main/user/add-user");
+        return modelAndView;
+    }
+
+    /**
      * 任务日志页面
      * @param jobInfoId
      * @return
