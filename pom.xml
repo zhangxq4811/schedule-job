@@ -93,6 +93,7 @@
     </dependencies>
 
     <build>
+        <finalName>zxq-cloud-job</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
