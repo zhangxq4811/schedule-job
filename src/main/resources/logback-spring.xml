@@ -11,12 +11,12 @@
 
 	<appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<File>logs/access.log</File>
-<!--		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
-<!--			&lt;!&ndash; daily rollover 保存历史记录到这个文件夹一日起为后缀 &ndash;&gt;-->
-<!--			<FileNamePattern>/tmp/logs/schedule-job/output.%d{yyyy-MM-dd}.log</FileNamePattern>-->
-<!--			&lt;!&ndash; keep 30 days' worth of history &ndash;&gt;-->
-<!--			<maxHistory>30</maxHistory>-->
-<!--		</rollingPolicy>-->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover 保存历史记录到这个文件夹一日起为后缀 -->
+			<FileNamePattern>/tmp/logs/schedule-job/output.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
 		<encoder>
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</Pattern>
 			<charset>UTF-8</charset> <!-- 此处设置字符集 -->
@@ -32,12 +32,12 @@
 			<onMismatch>DENY</onMismatch>
 		</filter>
 		<!-- 最常用的滚动策略，它根据时间来制定滚动策略.既负责滚动也负责出发滚动 -->
-<!--		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
-<!--			&lt;!&ndash;日志输出位置  可相对、和绝对路径 &ndash;&gt;-->
-<!--			<fileNamePattern>/tmp/logs/schedule-job/error.%d{yyyy-MM-dd}.log</fileNamePattern>-->
-<!--			&lt;!&ndash;日志文件保留天数&ndash;&gt;-->
-<!--			<maxHistory>30</maxHistory>-->
-<!--		</rollingPolicy>-->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!--日志输出位置  可相对、和绝对路径 -->
+			<fileNamePattern>/tmp/logs/schedule-job/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!--日志文件保留天数-->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
 			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>
