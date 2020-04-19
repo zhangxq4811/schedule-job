@@ -29,10 +29,10 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/*Mapper.xml
-  type-aliases-package: com.zxq.cloud.model
+  type-aliases-package: com.zxq.model
 
 # mybatis日志输出级别
 logging:
   level:
-    com.zxq.cloud.dao: info
+    com.zxq.dao: info
 

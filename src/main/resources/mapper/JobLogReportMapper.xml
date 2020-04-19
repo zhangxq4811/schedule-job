@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zxq.cloud.dao.JobLogReportMapper">
-  <resultMap id="BaseResultMap" type="com.zxq.cloud.model.po.JobLogReport">
+<mapper namespace="com.zxq.dao.JobLogReportMapper">
+  <resultMap id="BaseResultMap" type="com.zxq.model.po.JobLogReport">
     <!--
       WARNING - @mbg.generated
     -->
@@ -13,7 +13,7 @@
   </resultMap>
   <update id="increaseRunningCount" parameterType="java.lang.Integer">
     UPDATE
-        zxq_job_log_report
+        schedule_job_log_report
     SET
         running_count = running_count + 1
     WHERE id = #{id}
@@ -21,7 +21,7 @@
 
   <update id="increaseSuccessCount" parameterType="java.lang.Integer">
    UPDATE
-        zxq_job_log_report
+        schedule_job_log_report
     SET
         success_count = success_count + 1,
         running_count = running_count - 1
@@ -30,7 +30,7 @@
 
   <update id="increaseFailCount" parameterType="java.lang.Integer">
     UPDATE
-        zxq_job_log_report
+        schedule_job_log_report
     SET
         fail_count = fail_count + 1,
         running_count = running_count - 1

@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.zxq</groupId>
-    <artifactId>zxq-cloud-job</artifactId>
+    <artifactId>schedule-job</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>zxq-cloud-job</name>
+    <name>schedule-job</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -93,7 +93,7 @@
     </dependencies>
 
     <build>
-        <finalName>zxq-cloud-job</finalName>
+        <finalName>schedule-job</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

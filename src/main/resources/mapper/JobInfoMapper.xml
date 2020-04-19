@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zxq.cloud.dao.JobInfoMapper">
-  <resultMap id="BaseResultMap" type="com.zxq.cloud.model.bo.JobInfoBO">
+<mapper namespace="com.zxq.dao.JobInfoMapper">
+  <resultMap id="BaseResultMap" type="com.zxq.model.bo.JobInfoBO">
     <!--
       WARNING - @mbg.generated
     -->
@@ -21,8 +21,8 @@
         jinfo.*,
         jgroup.NAME AS jobGroupName
     FROM
-        zxq_job_info jinfo
-    LEFT JOIN zxq_job_group jgroup ON jinfo.job_group_id = jgroup.id
+        schedule_job_info jinfo
+    LEFT JOIN schedule_job_group jgroup ON jinfo.job_group_id = jgroup.id
     WHERE jinfo.status != -1
     <if test="query.status != null">
       AND jinfo.status = #{query.status}
