@@ -186,6 +186,7 @@ public class JobManagerService {
 
     /**
      * 修改任务
+     *    每次编辑，都是新增一个调度任务替换旧的调度任务
      * @param scheduler
      * @param jobInfoBO
      * @return
@@ -205,21 +206,20 @@ public class JobManagerService {
             return checkRes;
         }
         jobInfoMapper.updateByPrimaryKeySelective(jobInfoBO);
-        JobKey jobKey = JobUtil.getJobKey(jobInfoInDB);
         try {
-            // 重新设置JobDataMap的数据
+            JobKey jobKey = JobUtil.getJobKey(jobInfoInDB);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+            // 删除旧任务
+            scheduler.deleteJob(jobKey);
+            // 新增任务
             jobDetail.getJobDataMap().put(JobConstant.JOB_INFO_IN_JOB_DATA_MAP_KEY, JSONUtil.toJsonStr(jobInfoBO));
-            if (!jobInfoInDB.getCron().equals(jobInfoBO.getCron())) {
-                // 修改任务的触发时间
-                TriggerKey triggerKey = JobUtil.getTriggerKey(jobInfoInDB);
-                CronTrigger newTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey)
-                        .withSchedule(CronScheduleBuilder.cronSchedule(jobInfoBO.getCron())).build();
-                scheduler.rescheduleJob(triggerKey, newTrigger);
-                // 如果编辑的任务为暂停状态,修改完触发器之后再次执行暂停操作
-                if (JobEnums.JobStatus.PAUSING.status().equals(jobInfoInDB.getStatus())) {
-                    scheduler.pauseJob(jobKey);
-                }
+            CronTrigger trigger = TriggerBuilder.newTrigger().forJob(jobDetail).withIdentity(JobUtil.getTriggerKey(jobInfoBO))
+                    .withSchedule(CronScheduleBuilder.cronSchedule(jobInfoBO.getCron()).withMisfireHandlingInstructionDoNothing())
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+            // 原任务为暂停状态，新增任务状态要与原来保持一致
+            if (JobEnums.JobStatus.PAUSING.status().equals(jobInfoInDB.getStatus())) {
+                scheduler.pauseJob(jobKey);
             }
         } catch (Exception e) {
             log.error("jobInfoId = {} editJob error : {}", jobInfoInDB.getId(), e);
@@ -228,4 +228,5 @@ public class JobManagerService {
         }
         return JobConstant.SUCCESS_CODE;
     }
+
 }

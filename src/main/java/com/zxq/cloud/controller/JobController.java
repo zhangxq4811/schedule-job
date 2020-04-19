@@ -75,7 +75,7 @@ public class JobController {
             return "非法的任务corn表达式";
         }
         // 有参数，校验参数是否为json格式
-        if (StrUtil.isNotBlank(jobInfoBO.getParams()) && JSONUtil.isJson(jobInfoBO.getParams())) {
+        if (StrUtil.isNotBlank(jobInfoBO.getParams()) && !JSONUtil.isJson(jobInfoBO.getParams())) {
             return "非法的任务参数格式";
         }
         return JobConstant.SUCCESS_CODE;
@@ -218,9 +218,9 @@ public class JobController {
             startDate = DateUtil.parseDateTime(startTime);
             endDate = DateUtil.parseDateTime(endTime);
         } else if (StrUtil.isBlank(startTime) && StrUtil.isBlank(endTime)) {
-            // 默认统计过去5天数据
+            // 默认统计过去一周数据
             DateTime date = DateUtil.date();
-            startDate = DateUtil.beginOfDay(DateUtil.offsetDay(date, -4));
+            startDate = DateUtil.beginOfDay(DateUtil.offsetDay(date, -6));
             endDate = DateUtil.endOfDay(date);
         } else {
             return ResultVO.failure("params error");

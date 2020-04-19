@@ -22,14 +22,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final static List<String> EXCLUDE_PATH = new ArrayList<>();
 
     static {
-        EXCLUDE_PATH.add("/login");
-        EXCLUDE_PATH.add("/user/auth");
-        EXCLUDE_PATH.add("/user/getVerityCode");
+        // 静态资源
         EXCLUDE_PATH.add("/css/**");
         EXCLUDE_PATH.add("/fonts/**");
         EXCLUDE_PATH.add("/images/**");
         EXCLUDE_PATH.add("/js/**");
         EXCLUDE_PATH.add("/lib/**");
+        //
+        EXCLUDE_PATH.add("/login");
+        EXCLUDE_PATH.add("/user/auth");
+        EXCLUDE_PATH.add("/user/getVerityCode");
     }
 
     @Override

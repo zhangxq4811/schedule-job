@@ -13,8 +13,6 @@ import javax.servlet.http.HttpSession;
  **/
 public class SessionUtil {
 
-    private static HttpSession session = getSession();
-
     /**
      * 登录验证码存放在session的key
      */
@@ -40,6 +38,7 @@ public class SessionUtil {
      */
     public static void putVerityCode(String verityCode) {
         if (StrUtil.isNotBlank(verityCode)) {
+            HttpSession session = getSession();
             session.setAttribute(VERITY_CODE_IN_SESSION_KEY, verityCode);
         }
     }
@@ -48,6 +47,7 @@ public class SessionUtil {
      * 获取session中的登录验证码
      */
     public static String getVerityCode() {
+        HttpSession session = getSession();
         return (String) session.getAttribute(VERITY_CODE_IN_SESSION_KEY);
     }
 
@@ -55,6 +55,7 @@ public class SessionUtil {
      * 删除session中的登录验证码
      */
     public static void removeVerityCode() {
+        HttpSession session = getSession();
         session.removeAttribute(VERITY_CODE_IN_SESSION_KEY);
     }
 
@@ -64,6 +65,7 @@ public class SessionUtil {
      */
     public static void putUserInfo(User user) {
         if (user != null) {
+            HttpSession session = getSession();
             session.setAttribute(USER_INFO_IN_SESSION_KEY, user);
         }
     }
@@ -72,6 +74,7 @@ public class SessionUtil {
      * 删除session中的用户信息
      */
     public static void removeUserInfo() {
+        HttpSession session = getSession();
         session.removeAttribute(USER_INFO_IN_SESSION_KEY);
     }
 
@@ -80,6 +83,7 @@ public class SessionUtil {
      * @return
      */
     public static User getUserInfo() {
+        HttpSession session = getSession();
         return (User) session.getAttribute(USER_INFO_IN_SESSION_KEY);
     }
 
