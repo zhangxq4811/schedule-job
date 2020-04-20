@@ -11,16 +11,16 @@ Springboot整合Quartz基于数据库的调度平台，通过web界面动态地�
 
 首页
 
-![image-20200420143133412](C:\Users\Doctor\AppData\Roaming\Typora\typora-user-images\image-20200420143133412.png)
+![image-20200420143133412](https://raw.githubusercontent.com/zhangxq4811/resource-center/master/%E9%A6%96%E9%A1%B5.png)
 
 任务管理页
 
-![image-20200420143159810](C:\Users\Doctor\AppData\Roaming\Typora\typora-user-images\image-20200420143159810.png)
+![image-20200420143159810](https://raw.githubusercontent.com/zhangxq4811/resource-center/master/%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E7%95%8C%E9%9D%A2.png)
 
 添加任务
 
-![image-20200420143217926](C:\Users\Doctor\AppData\Roaming\Typora\typora-user-images\image-20200420143217926.png)
+![image-20200420143217926](https://raw.githubusercontent.com/zhangxq4811/resource-center/master/%E6%96%B0%E5%A2%9E%E4%BB%BB%E5%8A%A1.png)
 
 任务日志
 
-![image-20200420143242054](C:\Users\Doctor\AppData\Roaming\Typora\typora-user-images\image-20200420143242054.png)
+![image-20200420143242054](https://github.com/zhangxq4811/resource-center/blob/master/%E6%97%A5%E5%BF%97%E8%AF%A6%E6%83%85.png)
