@@ -10,10 +10,10 @@
 	<!-- 日志生成位置 -->
 
 	<appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>logs/access.log</File>
+		<File>logs/output.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover 保存历史记录到这个文件夹一日起为后缀 -->
-			<FileNamePattern>/tmp/logs/schedule-job/output.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<FileNamePattern>logs/output.%d{yyyy-MM-dd}.log</FileNamePattern>
 			<!-- keep 30 days' worth of history -->
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
@@ -34,7 +34,7 @@
 		<!-- 最常用的滚动策略，它根据时间来制定滚动策略.既负责滚动也负责出发滚动 -->
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!--日志输出位置  可相对、和绝对路径 -->
-			<fileNamePattern>/tmp/logs/schedule-job/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>logs/error.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<!--日志文件保留天数-->
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
