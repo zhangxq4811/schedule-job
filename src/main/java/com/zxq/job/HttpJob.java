@@ -50,13 +50,13 @@ public class HttpJob extends QuartzJobBean {
         // 开启计时器
         TimeInterval timer = DateUtil.timer();
 
-        // 更新当天的任务日志报表
-        int reportId = this.getJobLogReportByDay(DateUtil.beginOfDay(DateUtil.date()));
-        jobLogReportMapper.increaseRunningCount(reportId);
-
         // 创建任务执行记录
         JobLog jobLog = new JobLog();
         jobLog.setCreateTime(DateUtil.date());
+
+        // 更新当天的任务日志报表
+        int reportId = this.getJobLogReportByDay(DateUtil.beginOfDay(DateUtil.date()));
+        jobLogReportMapper.increaseRunningCount(reportId);
 
         // 获取任务执行的数据
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
@@ -69,13 +69,13 @@ public class HttpJob extends QuartzJobBean {
             String executeResult = sendHttpRequest(jobInfo);
             jobLog.setExecuteStatus(JobEnums.JobLogStatus.SUCCESS.status());
             jobLogReportMapper.increaseSuccessCount(reportId);
-            log.error("HttpJob jobInfoId = {} url = {} execute success, HttpResponse : {}", jobInfo.getId(), jobInfo.getUrl(), executeResult);
+            log.info("HttpJob title = {} execute success, HttpResponse : {}", jobInfo.getTitle(), executeResult);
         } catch (Exception e) {
             // http请求失败
             jobLog.setExecuteStatus(JobEnums.JobLogStatus.FAILURE.status());
             jobLog.setExecuteFailMsg(e.getMessage());
             jobLogReportMapper.increaseFailCount(reportId);
-            log.error("HttpJob jobInfoId = {} url = {} execute fail, HttpResponse : {}", jobInfo.getId(), jobInfo.getUrl(), e);
+            log.error("HttpJob title = {} execute fail, HttpResponse : {}", jobInfo.getTitle(), e);
         }
 
         //计算任务执行花费时间(毫秒)

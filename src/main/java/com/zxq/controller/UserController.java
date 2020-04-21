@@ -44,12 +44,12 @@ public class UserController {
     public void getVerityCode(HttpServletResponse response) throws IOException {
         //定义图形验证码的长和宽
         LineCaptcha captcha = CaptchaUtil.createLineCaptcha(200, 100);
-        //图形验证码写出到流
-        captcha.write(response.getOutputStream());
         String code = captcha.getCode();
         log.info("user getVerityCode = {}", code);
         //将验证码存放至session中
         SessionUtil.putVerityCode(code);
+        //图形验证码写出到流
+        captcha.write(response.getOutputStream());
     }
 
     /**
